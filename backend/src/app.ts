@@ -1,13 +1,21 @@
-import express from "express";
+import express, { NextFunction } from "express";
 import userRouter from "./users/userRoutes";
+import globalErrorHandler from "./middleware/globalErrorHandler";
+import cookieParser from "cookie-parser";
+import blogRouter from "./blogs/blogRouter";
+import bodyParser from "body-parser";
 
 const app = express();
 app.use(express.json());
-
+app.use(cookieParser());
+// app.use(bodyParser.json())
 app.get("/", (req, res) => {
   res.send({ msg: "everything is fine" });
 });
 
 app.use("/api/user", userRouter);
+app.use("/api/blog", blogRouter);
+
+app.use(globalErrorHandler);
 
 export default app;
