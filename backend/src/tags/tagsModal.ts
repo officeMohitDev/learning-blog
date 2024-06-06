@@ -4,6 +4,9 @@ const tagsSchema = new mongoose.Schema({
     tag: {
         type: String,
         required: true
+    },
+    description: {
+        type: String
     }
 }, {
     timestamps: true
