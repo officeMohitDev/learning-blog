@@ -4,7 +4,7 @@ import React from 'react'
 
 const BlogCard = () => {
     return (
-        <Link href={"/"} className='max-w-[40rem] rounded-lg flex flex-col bg-white shadow-lg'>
+        <Link href={"/blog/123"} className='max-w-[40rem] rounded-lg flex flex-col bg-white shadow-lg'>
             <div className='w-full h-[300px] rounded-lg'>
                 <img src={"/images/blogHero.jpg"} className='w-full rounded-tr rounded-tl h-[300px] object-cover' alt='hero' />
             </div>

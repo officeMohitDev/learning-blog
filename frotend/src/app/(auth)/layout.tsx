@@ -15,12 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <div className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
-        )}>
-            auth nigga
-            {children}
-        </div>
+    <div className={cn(
+      "min-h-screen bg-background font-sans antialiased",
+      fontSans.variable
+    )}>
+      {children}
+    </div>
   );
 }
