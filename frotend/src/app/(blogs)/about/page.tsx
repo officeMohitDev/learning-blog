@@ -2,11 +2,11 @@ import React from 'react'
 
 const AboutPage = () => {
     return (
-        <div className='mx-12'>
-            <div className=''>
+        <div className='md:mx-12 mx-2'>
+            <div className='mx-auto'>
                 <div>
-                    <div className=''>
-                        <img src='/images/aboutImg.jpeg' className='md:h-[600px] md:w-full rounded-lg w-80 h-40 object-contain' alt='about her' />
+                    <div className='flex justify-center '>
+                        <img src='/images/aboutImg.jpeg' className='md:h-[600px] md:w-[90%] rounded-lg w-80 h-40 object-fill ' alt='about her' />
                     </div>
                 </div>
                 <section className="text-center px-4 py-8 md:py-12 max-w-[45rem] mx-auto">
