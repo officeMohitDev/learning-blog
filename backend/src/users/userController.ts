@@ -62,7 +62,7 @@ export const loginUser = async (
       return next(error);
     }
 
-    const isPassCorrect = await bcrypt.compare(password, user.password);
+    const isPassCorrect = await bcrypt.compare(password, user.password as string);
 
     if (!isPassCorrect) {
       const error = createHttpError(400, "username or password is incorrect");
