@@ -40,3 +40,12 @@ export const tags = [
         path: "/experiences"
     }
 ];
+
+export const links = [
+    { id: "home-link", href: "/", text: "Home" },
+    { id: "about-link", href: "/about", text: "About" },
+    { id: "contact-link", href: "/contact", text: "Contact" },
+    { id: "authors-link", href: "/authors", text: "Authors" },
+    { id: "tags-link", href: "/tags", text: "Tags" },
+    { id: "signin-link", href: "/signin", text: "Log In" }
+];

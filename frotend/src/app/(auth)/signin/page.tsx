@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { motion } from "framer-motion"
 import React, { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button';
 
 const SignInPage = () => {
   const [isMonthly, setIsMonthly] = useState(true);
@@ -59,6 +60,7 @@ const SignInPage = () => {
                 className="w-full p-2 border border-gray-300 rounded"
               />
             </div>
+            <Button color='' className='w-full hover:bg-[#DC2626] bg-[#DC2626]'>Sign In</Button>
 
             <p className="text-center mt-6">
               Dont have an Account? <Link href="/signup" className="text-red-600">Sign up</Link>

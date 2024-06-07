@@ -1,9 +1,13 @@
+"use client"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { SearchIcon, SunIcon } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { links } from "@/constants"
 
 export default function Navbar() {
+  const pathname = usePathname();
   return (
     <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-24">
       <Sheet>
@@ -19,24 +23,13 @@ export default function Navbar() {
             <span className="sr-only">Acme Inc</span>
           </Link>
           <div className="grid gap-2 py-6">
-            <Link href="#" className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
-              Home
-            </Link>
-            <Link href="/about" className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
-              About
-            </Link>
-            <Link href="/contact" className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
-              Contact
-            </Link>
-            <Link href="/authors" className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
-              Authors
-            </Link>
-            <Link href="/tags" className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
-              Tags
-            </Link>
-            <Link href="/sigin" className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
-              Log In
-            </Link>
+            {
+              links.map((link: any) => (
+                <Link key={link.id} id={link.id} href={link.href} className="flex w-full items-center py-2 text-lg font-semibold" prefetch={false}>
+                  {link.text}
+                </Link>
+              ))
+            }
             <button
               className="bg-transparent flex items-start justify-start -ml-4 p-3"
             >
@@ -56,48 +49,19 @@ export default function Navbar() {
         <span className="">Kahi Suni</span>
       </Link>
       <nav className="ml-auto hidden lg:flex gap-6">
-        <Link
-          href="/"
-          className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-          prefetch={false}
-        >
-          Home
-        </Link>
-        <Link
-          href="/about"
-          className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-          prefetch={false}
-        >
-          About
-        </Link>
-        <Link
-          href="/contact"
-          className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-          prefetch={false}
-        >
-          Contact
-        </Link>
-        <Link
-          href="/authors"
-          className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-          prefetch={false}
-        >
-          Authors
-        </Link>
-        <Link
-          href="/tags"
-          className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-          prefetch={false}
-        >
-          Tags
-        </Link>
-        <Link
-          href="/signin"
-          className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
-          prefetch={false}
-        >
-          Login
-        </Link>
+        {
+          links.map((link) => (
+            <Link
+              href={link.href}
+              key={link.id}
+              className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 ${pathname === link.href ? "bg-gray-100 text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50 outline-none disabled:pointer-events-none" : "bg-white disabled:opacity-50 dark:bg-gray-950"}  focus: focus:  data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50  dark:hover:bg-gray-800 dark:hover:text-gray-50   dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
+              prefetch={false}
+            >
+              {link.text}
+            </Link>
+          ))
+        }
+
         <Button
           className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
         >
