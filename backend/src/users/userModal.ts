@@ -9,7 +9,6 @@ const userSchema = new Schema(
     username: {
       type: String,
       required: true,
-      unique: true,
     },
     email: {
       type: String,
@@ -18,12 +17,11 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
     },
     about: {
       type: String,
     },
-    profilePicture: String,
+    image: String,
     website: String,
     socialLinks: {
       twitter: String,

@@ -5,8 +5,20 @@ import Link from "next/link"
 import { SearchIcon, SunIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { links } from "@/constants"
+import { getCurrentUser } from "@/actions"
+import { useEffect, useState } from "react"
 
 export default function Navbar() {
+  const [user, setUser] = useState<any>()
+  const getUser = async () => {
+    const user: any = await getCurrentUser()
+    setUser(user)
+  }
+
+  useEffect(() => {
+    getUser()
+  }, [])
+
   const pathname = usePathname();
   return (
     <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-24">
@@ -43,15 +55,36 @@ export default function Navbar() {
           </div>
         </SheetContent>
       </Sheet>
-      <Link href="#" className="mr-6 ml-6 hidden lg:flex lg:items-center gap-5 font-bold" prefetch={false}>
-        <MountainIcon className="h-6 w-6" />
-        <span className="sr-only">Acme Inc</span>
-        <span className="">Kahi Suni</span>
+      <Link href="/" className="mr-6 ml-6 hidden lg:flex lg:items-center gap-5 font-bold" prefetch={false}>
+        <img src="/images/logo.png" alt="" className="w-14" />
+        {/* <span className="sr-only">Acme Inc</span>
+        <span className="">Kahi Suni</span> */}
       </Link>
       <nav className="ml-auto hidden lg:flex gap-6">
         {
-          links.map((link) => (
-            <Link
+          links.map((link) => {
+            if (link.text === "Log In" && user) {
+              return user ? (
+                <Link
+                  href={"/profile"}
+                  key={25}
+                  className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
+                  prefetch={false}
+                >
+                  <img className="w-8 h-8 rounded-full ring-4 ring-white" src={user?.image || "/images/noprofile.png"} alt={user.name} />
+                </Link>
+              ) : (
+                <Link
+                  href={link.href}
+                  key={link.id}
+                  className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 ${pathname === link.href ? "bg-gray-100 text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50 outline-none disabled:pointer-events-none" : "bg-white disabled:opacity-50 dark:bg-gray-950"}  focus: focus:  data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50  dark:hover:bg-gray-800 dark:hover:text-gray-50   dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
+                  prefetch={false}
+                >
+                  {link.text}
+                </Link>
+              )
+            }
+            return <Link
               href={link.href}
               key={link.id}
               className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 ${pathname === link.href ? "bg-gray-100 text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50 outline-none disabled:pointer-events-none" : "bg-white disabled:opacity-50 dark:bg-gray-950"}  focus: focus:  data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50  dark:hover:bg-gray-800 dark:hover:text-gray-50   dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
@@ -59,7 +92,7 @@ export default function Navbar() {
             >
               {link.text}
             </Link>
-          ))
+          })
         }
 
         <Button

@@ -5,6 +5,9 @@ import React, { useEffect, useState } from 'react'
 import { Label } from '@radix-ui/react-label';
 import { Input } from '@/components/ui/input';
 import '../index.css'
+import GoogleButton from '@/components/GoogleButton';
+import { Button } from '@/components/ui/button';
+import GithubButton from '@/components/GithubButton';
 
 const SignUpPage = () => {
   const [isMonthly, setIsMonthly] = useState(true);
@@ -32,12 +35,12 @@ const SignUpPage = () => {
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center min-h-screen w-full p-4"
+      className="flex flex-col items-center justify-center h-fit w-full p-4"
       initial="initial"
       animate={isMounted ? "animate" : "initial"}
       variants={pageVariants}
     >
-      <div className="flex items-center justify-between w-full mb-6">
+      <div className="flex items-center justify-between w-full mb-1">
         <Link href={"/"} className="text-gray-500">&larr; Back</Link>
         <button className="text-gray-500">&times;</button>
       </div>
@@ -65,7 +68,7 @@ const SignUpPage = () => {
               <Input type="password" id="password" placeholder="password" className='outline-none w-full' />
             </div>
           </div>
-          <div className="flex items-center justify-center space-x-4 mb-6">
+          {/* <div className="flex items-center justify-center space-x-4 mb-6">
             <button
               type="button"
               className={`px-4 py-2 rounded-full ${isMonthly ? 'bg-gray-200' : 'bg-white'}`}
@@ -80,8 +83,8 @@ const SignUpPage = () => {
             >
               Yearly
             </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          </div> */}
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="border rounded-lg p-6 text-start">
               <h2 className="text-xl font-bold text-red-600">Free</h2>
               <p className="text-2xl font-bold mt-2">$0</p>
@@ -94,11 +97,17 @@ const SignUpPage = () => {
               <p className="text-gray-600 mt-2">Full access</p>
               <button className="mt-4 bg-red-600 text-white py-2 px-4 rounded-md">Continue</button>
             </div>
-          </div>
+          </div> */}
+          <Button className='w-full hover:bg-[#DC2626] bg-[#DC2626] mt-5'>Create a account</Button>
           <p className="text-center mt-6">
             Dont have an Account? <Link href="/signin" className="text-red-600">Sign In</Link>
           </p>
         </form>
+        <div className='w-full h-[0.2px] bg-gray-300 my-5'></div>
+        <div className='flex items-center gap-4'>
+          <GoogleButton />
+          <GithubButton />
+        </div>
       </div>
     </motion.div>
   )
