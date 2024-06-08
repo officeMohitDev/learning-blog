@@ -1,6 +1,7 @@
 "use server"
 
 import { auth, signIn } from "@/auth"
+import { AuthError } from "next-auth"
 
 interface Formdata {
     email: string,
@@ -22,23 +23,14 @@ export const getCurrentUser = async () => {
 
 export const loginUser = async (formdata: Formdata) => {
     try {
-        const res = await signIn("credentials", {
+        return await signIn("credentials", {
             email: formdata.email,
             password: formdata.password,
-            redirectTo: "/"
-        })
+            redirect: false
+        });
 
-        if (!res?.ok) {
-            const data = await res.json();
-        console.log('Failed to submit form:', data);
-        return {error: data.errors.message || "Error while registering" }
-        }
-        return {error: "hello"}
     } catch (error) {
-            console.log("error", error)
-        return 
-        
+        // console.log(error.response.data)
+        return { msg: "Something went wrong", status: "error" };
     }
-   
-    console.log(res, "error niggga")
-}
+};

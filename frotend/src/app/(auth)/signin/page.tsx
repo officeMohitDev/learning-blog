@@ -8,6 +8,7 @@ import GoogleButton from '@/components/GoogleButton';
 import GithubButton from '@/components/GithubButton';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 const SignInPage = () => {
   const [isMonthly, setIsMonthly] = useState(true);
@@ -41,7 +42,12 @@ const SignInPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     try {
-      const res = await loginUser(formData);
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      });
+
       console.log("formdata", res)
     } catch (error) {
       // Handle fetch errors
