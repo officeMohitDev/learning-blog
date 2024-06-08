@@ -68,14 +68,7 @@ export const loginUser = async (
       const error = createHttpError(400, "username or password is incorrect");
       return next(error);
     }
-
-    const token = sign({ id: user.id }, config.secret as string, {
-      expiresIn: "7d",
-    });
-
-    res.cookie('token', token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    }).status(200).json({token});
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }

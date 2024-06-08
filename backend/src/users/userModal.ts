@@ -21,6 +21,11 @@ const userSchema = new Schema(
     about: {
       type: String,
     },
+    role: {
+      type: String,
+      enum: ["user", "author"], // Add the possible roles here
+      default: "user", // Optionally set a default value
+    },
     image: String,
     website: String,
     socialLinks: {
@@ -61,5 +66,14 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
+
+// Pre-save middleware to set the default role
+userSchema.pre("save", function (next) {
+  if (!this.role) {
+    this.role = "user"; // Set the default role if not provided
+  }
+  next();
+});
+
 
 export const User = mongoose.model("User", userSchema);
