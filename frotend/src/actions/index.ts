@@ -30,7 +30,14 @@ export const loginUser = async (formdata: Formdata) => {
         });
 
     } catch (error) {
-        // console.log(error.response.data)
-        return { msg: "Something went wrong", status: "error" };
+         if (error instanceof AuthError) {
+            switch (error.type) {
+                case "CredentialsSignin": 
+                return { msg: "wrong", status: "error" };
+                default:
+                return { msg: "Something went wrong", status: "error" };
+            }
+         }
+         throw error
     }
 };

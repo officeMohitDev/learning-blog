@@ -49,3 +49,6 @@ export const links = [
     { id: "tags-link", href: "/tags", text: "Tags" },
     { id: "signin-link", href: "/signin", text: "Log In" }
 ];
+
+
+export const baseURL = process.env.BASE_URL

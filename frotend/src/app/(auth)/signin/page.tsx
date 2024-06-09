@@ -42,12 +42,7 @@ const SignInPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     try {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email: formData.email,
-        password: formData.password,
-      });
-
+      const res = await loginUser(formData)
       console.log("formdata", res)
     } catch (error) {
       // Handle fetch errors

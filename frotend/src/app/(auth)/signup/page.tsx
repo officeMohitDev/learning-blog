@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import GithubButton from '@/components/GithubButton';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { baseURL } from '@/constants';
 
 const SignUpPage = () => {
   const [isMonthly, setIsMonthly] = useState(true);
@@ -47,7 +48,7 @@ const SignUpPage = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch("http://localhost:3020/api/user/register", {
+      const res = await fetch(`${baseURL}/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

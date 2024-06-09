@@ -9,7 +9,7 @@ import React from 'react';
 const Footer = () => {
     return (
         <footer className="bg-gray-100 py-8 md:px-24 md:mt-6 mtau">
-            <div className="container mx-auto px-4">
+            <div className="mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between">
                     {/* Tags */}
                     <div className="mb-6 md:mb-0">

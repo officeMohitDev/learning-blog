@@ -1,11 +1,12 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
+import Credentials from "next-auth/providers/credentials";
 import clientPromise from "./lib/db";
 import { MongoDBAdapter } from "@auth/mongodb-adapter"; // Adjust the path to your utility function
 import { generateRandomUsername } from "./utils/generateRandomName";
 import { toast } from "sonner";
+import { baseURL } from "./constants";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -47,42 +48,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         } as any;
       },
     }),
-    CredentialsProvider({
-      name: 'Credentials',
+    Credentials({
+      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
+      // e.g. domain, username, password, 2FA token, etc.
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: {},
+        password: {},
       },
-      async authorize(credentials) {
-        try {
-          const res = await fetch("http://localhost:3020/api/user/login", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: credentials.email, password: credentials.password }),
-          });
-
-          if (!res.ok) {
-            const data = await res.json();
-            console.log("error in nigga", data)
-            throw Error(data) 
-          }
-          const data = await res.json();
-
-          return {
-            id: data.user.id,
-            name: data.user.name,
-            email: data.user.email, 
-            username: data.user.email,
-            role: data.user.role,
-            image: data.user.image,
-          } as any;
-        } catch (error) {
-          throw Error("err") 
-
+      authorize: async (credentials) => {
+        let res = await fetch(`${baseURL}/user/login`, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(credentials)
+        })
+        if (res.ok) {
+          const  user = await res.json();
+          return user
         }
-      },  
+         return null
+      },
     }),
   ],
   callbacks: {
