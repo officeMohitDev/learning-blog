@@ -84,7 +84,7 @@ const MediumProfile = () => {
   );
 };
 
-const Article = ({ title, description, date, views, comments, imagePlaceholder }) => (
+const Article = ({ title, description, date, views, comments, imagePlaceholder }: {title: String; description: String; date: String;  views:String; comments:String; imagePlaceholder:Boolean}) => (
   <article className="mb-8 flex justify-between">
     <div className='max-w-[50rem] flex flex-col justify-between'>
         <div>
