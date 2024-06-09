@@ -9,7 +9,6 @@ const userSchema = new Schema(
     username: {
       type: String,
       required: true,
-      unique: true,
     },
     email: {
       type: String,
@@ -18,12 +17,16 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
     },
     about: {
       type: String,
     },
-    profilePicture: String,
+    role: {
+      type: String,
+      enum: ["user", "author"], // Add the possible roles here
+      default: "user", // Optionally set a default value
+    },
+    image: String,
     website: String,
     socialLinks: {
       twitter: String,
@@ -63,5 +66,14 @@ const userSchema = new Schema(
     timestamps: true,
   }
 );
+
+// Pre-save middleware to set the default role
+userSchema.pre("save", function (next) {
+  if (!this.role) {
+    this.role = "user"; // Set the default role if not provided
+  }
+  next();
+});
+
 
 export const User = mongoose.model("User", userSchema);

@@ -27,7 +27,7 @@ export default function Home() {
           <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Personal</Link>
           <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Experiences</Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 md:px-24 px-3 gap-14 bg-[#FEFEFE]">
+        <div className="grid grid-cols-1 md:grid-cols-1 place-items-center md:place-items-start lg:grid-cols-3 md:px-24 px-3 gap-14 bg-[#FEFEFE]">
           <BlogCard />
           <BlogCard />
           <BlogCard />
