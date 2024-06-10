@@ -24,7 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          username: profile.email.split("@")[0],
+          username: generateRandomUsername(profile.name),
           role: "user",
         };
       },
@@ -43,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: profile.name,
           email: profile.email,
           image: profile.avatar_url,
-          username: profile?.email?.split("@")[0],
+          username: generateRandomUsername(profile.name as string),
           role: "user",
         } as any;
       },
@@ -85,7 +85,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = user.role;
         token.username = user.username;
       }
-      // console.log("token", token);
       return token;
     },
     

@@ -58,7 +58,7 @@ const userSchema = new Schema(
     savedPosts: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "Post",
+        ref: "Blog",
       },
     ],
   },

@@ -66,7 +66,7 @@ export default function Navbar() {
             if (link.text === "Log In" && user) {
               return user ? (
                 <Link
-                  href={"/profile"}
+                  href={`/profile/${user?.username}`}
                   key={25}
                   className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
                   prefetch={false}

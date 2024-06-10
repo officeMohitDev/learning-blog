@@ -72,8 +72,6 @@ const SignUpPage = () => {
       // Handle fetch errors
       console.error('Error submitting form:', error);
     }
-
-    console.log("formData", formData)
   }
 
 

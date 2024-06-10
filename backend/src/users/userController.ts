@@ -17,6 +17,8 @@ export const registerUser = async (
 
     const userExist = await User.findOne({ $or: [{ email }, { username }] });
 
+    const avatar  = `https://avatar.iran.liara.run/public/boy?username=${username}`
+
     if (userExist) {
       const errr = createHttpError(
         400,
@@ -32,6 +34,7 @@ export const registerUser = async (
       name: name,
       email: email,
       password: hashedPass,
+      image: avatar
     });
 
     res.status(201).json(user);
@@ -81,7 +84,7 @@ export const getUserDetails = async (
   next: NextFunction
 ) => {
   try {
-    const user =  await User.findOne({username: req.params.username})
+    const user =  await User.findOne({username: req.params.username}).populate("followers").populate('following').populate("savedPosts");
     if (!user) {
       const error = createHttpError(404, "User not found");
       return next(error)
