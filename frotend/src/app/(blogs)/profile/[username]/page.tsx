@@ -94,7 +94,7 @@ const ProfileCard = ({ data }: { data: any }) => (
         <p className="text-gray-500  text-[15px] hidden lg:flex">{data?.data?.about}</p>
         <div className='flex gap-4 w-full'>
           {
-            data.loggedInUser ? (
+            data?.loggedInUser ? (
               <>
                 <Link href='/profile/edit'>
                   <Button variant={'outline'} className="hidden w-full lg:flex lg:justify-center ">Edit Profile</Button>
