@@ -1,6 +1,7 @@
 
 import { auth } from '@/auth';
 import LogoutButton from '@/components/LogoutButton';
+import FollowButton from '@/components/buttons/FollowButton';
 import { Button } from '@/components/ui/button';
 import { baseURL } from '@/constants';
 import fetchWithHeaders from '@/utils/api';
@@ -8,17 +9,7 @@ import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 
-const followOrUnfollowUser = async (userId: string) => {
-  try {
-    const res = fetchWithHeaders(`${baseURL}/following/${userId}`, {
-      method: "PATCH",
-    })
 
-    console.log(res)
-  } catch (error) {
-    console.log(error)
-  }
-}
 
 const getUserDetails = async (username: string) => {
   try {
@@ -29,8 +20,9 @@ const getUserDetails = async (username: string) => {
       throw Error(data.message || "Error while fetching Data")
     }
     const data = await res.json();
-    console.log(data)
-    return { data, loggedInUser: session?.user?.email === data.email }
+    console.log(data?.followers, session?.user?.id)
+    console.log("real user", data?.followers.find((follower) => follower._id === session?.user?.id))
+    return { data, loggedInUser: session?.user?.email === data.email, currentUser: session?.user }
   } catch (error) {
     console.log(error)
     throw new Error("error")
@@ -39,7 +31,7 @@ const getUserDetails = async (username: string) => {
 
 const MediumProfile = async ({ params }: { params: { username: string } }) => {
   const data = await getUserDetails(params.username)
-  console.log("data in medium", data)
+
   return (
     <div className='w-full'>
       <div className="mx-auto py-6 lg:px-28 px-4 lg:mt-6">
@@ -103,7 +95,7 @@ const Article = ({ title, description, date, views, comments, imagePlaceholder }
   </article>
 );
 
-const ProfileCard = ({ data }: { data: any }) => (
+const ProfileCard = ({ data }) => (
   <div className="flex  flex-col items-start lg:items-start">
     <div className="flex lg:flex-col gap-4 items-center lg:items-start">
       <img src={data?.data?.image} className='w-16 h-16 rounded-full' alt="" />
@@ -123,7 +115,7 @@ const ProfileCard = ({ data }: { data: any }) => (
                 <LogoutButton mobile={false} />
               </>
             ) : (
-              <Button onClick={() => followOrUnfollowUser(data?.data?._id)} className="hidden w-full lg:flex lg:justify-center bg-[#EF4444] hover:bg-[#EF4444]/80 text-white">Follow</Button>
+              <FollowButton data={data} />
             )
           }
         </div>
@@ -133,13 +125,13 @@ const ProfileCard = ({ data }: { data: any }) => (
       <h3 className="text-lg font-semibold flex gap-4">Following <span className='text-[15px] text-gray-600'>{data?.data?.followers?.length}</span> </h3>
       <ul className="mt-2 space-y-2">
         {
-          data?.data?.followers?.map((follower: any) => (
+          data?.data?.following?.map((follower: any) => (
             <li key={follower} className='flex gap-2 justify-between items-center'>
               <div className='flex gap-3 items-center'>
                 <div>
-                  <img src={data.data.image} className='w-6 h-6 rounded-full' alt="" />
+                  <img src={follower?.image} className='w-6 h-6 rounded-full' alt="" />
                 </div>
-                <p className='text-[10px]'>Moht rah</p>
+                <Link href={`/profile/${follower?.username}`} className='text-[10px]'>{follower?.username}</Link>
               </div>
               <button className=''>
                 <MoreHorizontal size={20} />
