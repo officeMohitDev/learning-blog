@@ -10,6 +10,8 @@ import path from "node:path";
 import cloudinary from "../config/cloudinary";
 import fs from 'fs'
 import { userUpdateSchema } from "../validators/user-validator";
+import getUserIdFromAuthorizationHeader from "../utils/token";
+import { ObjectId } from "mongoose";
 
 export const registerUser = async (
   req: Request,
@@ -179,3 +181,45 @@ export const profileMe =  async (req: Request,
   }
 
 
+  export const followUnfollowUser = async (req: Request,
+    res: Response,
+    next: NextFunction) => {
+      try {
+        const userId = req.params.userId;
+        const followingUserId = getUserIdFromAuthorizationHeader(req); // Extracting the following user ID from the Authorization header
+        if (!userId) {
+          const error = createHttpError(400, "Please provide userid");
+          next(error);
+          return;
+        }
+  
+        const followedUser = await User.findOne({ _id: userId });
+        if (!followedUser) {
+          const error = createHttpError(404, "User not found");
+          next(error);
+          return;
+        }
+
+        if(!followingUserId) {
+          const error = createHttpError(404, "User not found");
+          next(error);
+          return;
+        }
+
+        const isAlreadyFollowed = followedUser.followers.includes(followingUserId as any);
+  
+        if (isAlreadyFollowed) {
+          // Unfollow the user
+          const updatedFollowedUser = await User.findByIdAndUpdate({_id: userId}, { $pull: { followers: followingUserId } }, { new: true });
+          const updatedFollowingUser = await User.findByIdAndUpdate({_id: followingUserId}, { $pull: { following: userId } }, { new: true })
+          res.status(200).json({ message: "User unfollowed", user: {updatedFollowedUser, updatedFollowingUser} });
+        } else {
+          // Follow the user
+          const updatedFollowedUser = await User.findByIdAndUpdate({_id: userId}, { $addToSet: { followers: followingUserId } }, { new: true });
+          const updatedFollowingUser = await User.findByIdAndUpdate({_id: followingUserId}, { $addToSet: { following: userId } }, { new: true })
+          res.status(200).json({ message: "User followed", user: {updatedFollowedUser, updatedFollowingUser} });
+        }
+      } catch (error) {
+        next(error);
+      }
+    };

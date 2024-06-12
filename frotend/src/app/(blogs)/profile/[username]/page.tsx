@@ -3,9 +3,22 @@ import { auth } from '@/auth';
 import LogoutButton from '@/components/LogoutButton';
 import { Button } from '@/components/ui/button';
 import { baseURL } from '@/constants';
+import fetchWithHeaders from '@/utils/api';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+
+const followOrUnfollowUser = async (userId: string) => {
+  try {
+    const res = fetchWithHeaders(`${baseURL}/following/${userId}`, {
+      method: "PATCH",
+    })
+
+    console.log(res)
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 const getUserDetails = async (username: string) => {
   try {
@@ -19,6 +32,7 @@ const getUserDetails = async (username: string) => {
     console.log(data)
     return { data, loggedInUser: session?.user?.email === data.email }
   } catch (error) {
+    console.log(error)
     throw new Error("error")
   }
 }
@@ -109,7 +123,7 @@ const ProfileCard = ({ data }: { data: any }) => (
                 <LogoutButton mobile={false} />
               </>
             ) : (
-              <Button className="hidden w-full lg:flex lg:justify-center bg-[#EF4444] hover:bg-[#EF4444]/80 text-white">Follow</Button>
+              <Button onClick={() => followOrUnfollowUser(data?.data?._id)} className="hidden w-full lg:flex lg:justify-center bg-[#EF4444] hover:bg-[#EF4444]/80 text-white">Follow</Button>
             )
           }
         </div>
