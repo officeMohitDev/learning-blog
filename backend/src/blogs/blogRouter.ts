@@ -11,7 +11,7 @@ const upload = multer({
     limits: {fileSize: 10 * 1024 * 1024}
 })
 
-blogRouter.post("/create", verifyToken, upload.fields([
+blogRouter.post("/create", upload.fields([
     {name: 'posterImg', maxCount: 1},
 ]), createBlog)
 

@@ -11,16 +11,21 @@ const getUserDetails = async (username: string) => {
   try {
     const session = await auth()
     const res = await fetch(`${baseURL}/user/details/${username}`);
+    if (!res.ok) {
+      const data = await res.json();
+      throw Error(data.message || "Error while fetching Data")
+    }
     const data = await res.json();
     console.log(data)
     return { data, loggedInUser: session?.user?.email === data.email }
   } catch (error) {
-    console.log(error)
+    throw new Error("error")
   }
 }
 
 const MediumProfile = async ({ params }: { params: { username: string } }) => {
   const data = await getUserDetails(params.username)
+  console.log("data in medium", data)
   return (
     <div className='w-full'>
       <div className="mx-auto py-6 lg:px-28 px-4 lg:mt-6">
@@ -85,21 +90,23 @@ const Article = ({ title, description, date, views, comments, imagePlaceholder }
 );
 
 const ProfileCard = ({ data }: { data: any }) => (
-  <div className="flex flex-col items-start lg:items-start">
+  <div className="flex  flex-col items-start lg:items-start">
     <div className="flex lg:flex-col gap-4 items-center lg:items-start">
       <img src={data?.data?.image} className='w-16 h-16 rounded-full' alt="" />
       <div className="lg:mt-4 lg:mt-0 flex flex-col lg:gap-3">
-        <h2 className="text-xl font-semibold">{data?.data?.username}</h2>
+        <h2 className="text-xl font-semibold">{data?.data?.name}</h2>
         <h2 className="text-[18px] text-gray-600">{data?.data?.followers?.length} Followers</h2>
-        <p className="text-gray-500  text-[15px] hidden lg:flex">{data?.data?.about}</p>
+        <div className=' max-w-[400px]'>
+          <p className="text-gray-500 text-[15px] hidden lg:flex">{data?.data?.about}</p>
+        </div>
         <div className='flex gap-4 w-full'>
           {
             data?.loggedInUser ? (
               <>
-                <Link href='/profile/edit'>
+                <Link href='/profile/edit' className='w-full'>
                   <Button variant={'outline'} className="hidden w-full lg:flex lg:justify-center ">Edit Profile</Button>
                 </Link>
-                <LogoutButton />
+                <LogoutButton mobile={false} />
               </>
             ) : (
               <Button className="hidden w-full lg:flex lg:justify-center bg-[#EF4444] hover:bg-[#EF4444]/80 text-white">Follow</Button>
@@ -128,7 +135,18 @@ const ProfileCard = ({ data }: { data: any }) => (
         }
       </ul>
     </div>
-    <button className="mt-4 mb-3 lg:hidden w-full justify-center flex px-4 py-2 bg-green-500 text-white rounded-full">Follow</button>
+    {
+      data?.loggedInUser ? (
+        <div className='flex gap-4 mt-6 w-full'>
+          <Link href='/profile/edit' className='w-full'>
+            <Button variant={'outline'} className="flex md:hidden w-full lg:hidden lg:justify-center ">Edit Profile</Button>
+          </Link>
+          <LogoutButton mobile={true} />
+        </div>
+      ) : (
+        <Button className="flex mt-6 w-full lg:hidden md:hidden lg:justify-center bg-[#EF4444] hover:bg-[#EF4444]/80 text-white">Follow</Button>
+      )
+    }
   </div>
 );
 

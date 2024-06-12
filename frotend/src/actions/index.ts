@@ -1,6 +1,7 @@
 "use server"
 
 import { auth, signIn } from "@/auth"
+import { baseURL } from "@/constants"
 import { AuthError } from "next-auth"
 
 interface Formdata {
@@ -19,6 +20,24 @@ export const getCurrentUser = async () => {
     const session = await auth();
     return session?.user
 }
+
+export const getUserDetails = async() => {
+    try {
+        const session:any = await auth();
+        const res = await fetch(`${baseURL}/user/profile`,  {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({id: session.user.id})
+        });
+        const data = await res.json();
+        return { data, loggedInUser: session?.user?.email === data.email }
+      } catch (error) {
+        console.log(error)
+      }
+}
+
 
 
 export const loginUser = async (formdata: Formdata) => {

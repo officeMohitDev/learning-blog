@@ -6,6 +6,10 @@ import bcrypt from "bcrypt";
 import { loginSchema, registerSchema } from "../validators/auth-validator";
 import { config } from "../config/config";
 import { sign } from "jsonwebtoken";
+import path from "node:path";
+import cloudinary from "../config/cloudinary";
+import fs from 'fs'
+import { userUpdateSchema } from "../validators/user-validator";
 
 export const registerUser = async (
   req: Request,
@@ -94,3 +98,84 @@ export const getUserDetails = async (
     next(error)
   }
 }
+
+export const updateUserDetails = async (req: Request,
+  res: Response,
+  next: NextFunction) => {
+  try {
+    const data = req.body;
+    const files = req.files as { [fieldName: string]: Express.Multer.File[] };
+    console.log(data)
+    console.log('Form Data:', data);
+    if (files && files['userPfp'] && files['userPfp'].length > 0) {
+        console.log('File:', files);
+        const file = files['userPfp'] && files['userPfp'][0]; // Access file using 'userPfp' field name
+        const pfpImageMimeType = files['userPfp'][0].mimetype.split("/").at(-1);
+        const fileName =  files['userPfp'][0].filename;
+        const filePath = path.resolve(__dirname, "../../public/data/uploads", fileName)
+        
+        const uploadResult = await cloudinary.uploader.upload(filePath, {
+          filename_override: fileName,
+          folder: "userPfps",
+          format: pfpImageMimeType
+        });
+
+        await fs.promises.unlink(filePath)
+
+        const data = req.body
+        const imageUrl = uploadResult.secure_url;
+        const userId = req.body.userId;
+        let parseddata = userUpdateSchema.parse(req.body);
+        parseddata.image = imageUrl; // Add the imageUrl to the parseddata object
+
+        const user = await User.findOne({ _id: userId })
+
+        if (!user) {
+          const error = createHttpError(404, "User not found")
+          return next(error)
+        }
+
+        const updateUser = await User.findOneAndUpdate({ _id: userId }, parseddata)
+
+        console.log("parseddata", parseddata);
+
+        res.status(200).json(updateUser);
+
+    } else {
+      let parseddata = userUpdateSchema.parse(req.body);
+      const userId = req.body.userId;
+      const user = await User.findOne({ _id: userId })
+
+      if (!user) {
+        const error = createHttpError(404, "User not found")
+        return next(error)
+      }
+
+      const updateUser = await User.findOneAndUpdate({ _id: userId }, parseddata)
+      res.status(200).json(updateUser);
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+
+
+export const profileMe =  async (req: Request,
+  res: Response,
+  next: NextFunction) => {
+    try {
+      const id = req.body.id;
+      console.log(id)
+      const user = await User.findOne({_id: id});
+      if (!user) {
+        const error = createHttpError(404, "user not found")
+        return next(error)
+      }
+
+      res.status(200).json(user)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+

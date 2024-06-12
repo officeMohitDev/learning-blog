@@ -5,18 +5,26 @@ import Link from "next/link"
 import { SearchIcon, SunIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { links } from "@/constants"
-import { getCurrentUser } from "@/actions"
+import { getCurrentUser, getUserDetails } from "@/actions"
 import { useEffect, useState } from "react"
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>()
+  const [user, setUser] = useState<any>();
+  const [userDB, setUserDB] = useState<any>()
   const getUser = async () => {
     const user: any = await getCurrentUser()
     setUser(user)
   }
 
+  const getUserDb = async () => {
+    const user = await getUserDetails()
+    console.log(user, "user comming from db")
+    setUserDB(user)
+  }
+
   useEffect(() => {
-    getUser()
+    getUser();
+    getUserDb()
   }, [])
 
   const pathname = usePathname();
@@ -66,12 +74,12 @@ export default function Navbar() {
             if (link.text === "Log In" && user) {
               return user ? (
                 <Link
-                  href={`/profile/${user?.username}`}
+                  href={`/profile/${userDB?.data?.username}`}
                   key={25}
                   className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
                   prefetch={false}
                 >
-                  <img className="w-8 h-8 rounded-full ring-4 ring-white" src={user?.image || "/images/noprofile.png"} alt={user.name} />
+                  <img className="w-8 h-8 rounded-full ring-4 ring-white" src={userDB?.data?.image || "/images/noprofile.png"} alt={user.name} />
                 </Link>
               ) : (
                 <Link

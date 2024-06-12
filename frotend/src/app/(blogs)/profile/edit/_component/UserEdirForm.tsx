@@ -9,24 +9,31 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { PopoverContent } from '@radix-ui/react-popover'
-import { CalendarIcon } from 'lucide-react'
+import { CalendarIcon, CameraIcon } from 'lucide-react'
 import { format } from 'date-fns'
-import React, { FormEvent, useState } from 'react'
+import "./comp.css"
+import React, { FormEvent, useRef, useState } from 'react'
+import { baseURL } from '@/constants'
+import { SampleDatePicker } from './CustomDatePicker'
 
+interface SocialLinks {
+    github: string;
+    linkedin: string;
+    medium: string;
+    instagram: string;
+    twitter: string;
+}
 
 
 interface FormData {
     username: string;
     name: string;
     role: string;
+    image: File | string;
     location: string;
     date?: Date;
     about: string;
-    github: string;
-    linkedin: string;
-    medium: string;
-    instagram: string;
-    twitter: string;
+    socialLinks: SocialLinks
     website: string;
 }
 
@@ -34,39 +41,109 @@ interface FormData {
 
 const UserEdirForm = ({ data }: { data: any }) => {
     const [date, setDate] = useState<Date>();
-    const { } = data
+    const [isLoading, setIsLoading] = useState(false)
+    const filRef = useRef(null);
+
+    const handleClickOnImage = () => {
+        if (filRef.current) {
+            const clickEvent = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            filRef.current.dispatchEvent(clickEvent);
+        }
+    };
     const [formData, setFormData] = useState<FormData>({
         username: data?.username,
         name: data?.name,
+        image: data?.image,
         role: data?.role,
         location: data?.location,
         date: data?.date,
         about: data?.about,
-        github: data?.socialLinks?.github,
-        linkedin: data?.socialLinks?.linkedin,
-        medium: data?.socialLinks?.medium,
-        instagram: data?.socialLinks?.instagram,
-        twitter: data?.socialLinks?.twitter,
+        socialLinks: {
+            github: data?.socialLinks?.github,
+            linkedin: data?.socialLinks?.linkedin,
+            medium: data?.socialLinks?.medium,
+            instagram: data?.socialLinks?.instagram,
+            twitter: data?.socialLinks?.twitter,
+        },
         website: data?.website
     })
 
-    console.log("data", data)
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
 
-    const handleUpdate = (e: FormEvent) => {
-        e.preventDefault();
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                image: e.target.files[0], // Set the selected file as the image
+            }));
+        }
+    };
+
+    console.log("user data", data)
+
+    const handleUpdate = async (e: FormEvent) => {
+        e.preventDefault()
+        setIsLoading(true)
+        const formValues = new FormData();
+
+        // Append only if the value is not undefined or null
+        if (formData.username) formValues.append("username", formData.username);
+        if (formData.name) formValues.append("name", formData.name);
+        if (formData.image) formValues.append("userPfp", formData.image);
+        if (formData.role) formValues.append("role", formData.role);
+        if (formData.location) formValues.append("location", formData.location);
+        if (formData.date) formValues.append("date", formData.date.toISOString());
+        if (formData.about) formValues.append("about", formData.about);
+        if (formData.website) formValues.append("website", formData.website);
+        formValues.append("userId", data._id)
+
+        // Handling nested socialLinks object
+        if (formData.socialLinks) {
+            Object.keys(formData.socialLinks).forEach(key => {
+                if (formData.socialLinks[key]) {
+                    formValues.append(`socialLinks[${key}]`, formData.socialLinks[key]);
+                }
+            });
+        }
+
+        // Log the FormData using forEach
+        formValues.forEach((value, key) => {
+            console.log(key, value);
+        });
+
         try {
-            console.log("formData", formData)
-        } catch (error) {
+            const res = await fetch(`${baseURL}/user/update`, {
+                method: "POST",
+                body: formValues, // Pass formValues as the body of the request
+            });
 
+            if (!res.ok) {
+                throw new Error("Network response was not ok");
+            }
+
+            const result = await res.json();
+            console.log("Success:", result);
+            setIsLoading(false)
+        } catch (error) {
+            console.error("Error:", error);
+            setIsLoading(false)
         }
     }
 
-
     return (
         <div className='lg:px-28 px-4 flex gap-4'>
-            <div className='flex-[2] mt-6 px-5 flex flex-col gap-3'>
-                <Button className='bg-transparent text-black hover:bg-gray-300 items-center justify-start'>Profile</Button>
-                <Button className='bg-transparent text-black hover:bg-gray-300 items-center justify-start'>Account</Button>
+            <div className='flex-[2] px-5 flex flex-col gap-3 items-center mt-12'>
+                <div onClick={handleClickOnImage} className='relative cursor-pointer group w-24 h-24'>
+                    <img src={typeof formData.image === 'string' ? formData.image : (formData.image ? URL.createObjectURL(formData.image) : '')} className='w-32 h-3w-32 object-cover rounded-full' alt="" />
+                    <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity'>
+                        <CameraIcon color='white' />
+                    </div>
+                </div>
+                <p className='text-[16px]'>Edit Profile picture</p>
+                <input className='hidden' onChange={handleFileChange} ref={filRef} type="file" name="" id="" />
             </div>
             <div className='mt-6 flex-[7]'>
                 <div className='space-y-2'>
@@ -123,7 +200,7 @@ const UserEdirForm = ({ data }: { data: any }) => {
                         </div>
                         <div className='flex w-full flex-col gap-4'>
                             <Label>Birth Date</Label>
-                            <Popover>
+                            {/* <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant={"outline"}
@@ -138,14 +215,15 @@ const UserEdirForm = ({ data }: { data: any }) => {
                                 </PopoverTrigger>
                                 <PopoverContent className="w-auto bg-white p-0">
                                     <Calendar
+                                        captionLayout="dropdown-buttons"
                                         mode="single"
                                         selected={formData.date}
                                         onSelect={(e) => setFormData({ ...formData, date: e })}
                                         initialFocus
                                     />
                                 </PopoverContent>
-                            </Popover>
-
+                            </Popover> */}
+                            <SampleDatePicker date={date} setDate={setDate} />
                         </div>
                     </div>
                     <div className='flex flex-col gap-4'>
@@ -160,27 +238,27 @@ const UserEdirForm = ({ data }: { data: any }) => {
                         <div className='grid grid-cols-2 gap-4'>
                             <div>
                                 <Label>Github</Label>
-                                <Input value={formData.github} onChange={(e) => setFormData({ ...formData, github: e.target.value })} />
+                                <Input value={formData.socialLinks.github} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, github: e.target.value } })} />
                             </div>
                             <div>
                                 <Label>Instagram</Label>
-                                <Input value={formData.instagram} onChange={(e) => setFormData({ ...formData, instagram: e.target.value })} />
+                                <Input value={formData.socialLinks.instagram} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, instagram: e.target.value } })} />
                             </div>
                             <div>
                                 <Label>Twitter</Label>
-                                <Input value={formData.twitter} onChange={(e) => setFormData({ ...formData, twitter: e.target.value })} />
+                                <Input value={formData.socialLinks.twitter} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, twitter: e.target.value } })} />
                             </div>
                             <div>
                                 <Label>Linkedin</Label>
-                                <Input value={formData.linkedin} onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })} />
+                                <Input value={formData.socialLinks.linkedin} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, linkedin: e.target.value } })} />
                             </div>
                             <div>
                                 <Label>Medium</Label>
-                                <Input value={formData.medium} onChange={(e) => setFormData({ ...formData, medium: e.target.value })} />
+                                <Input value={formData.socialLinks.medium} onChange={(e) => setFormData({ ...formData, socialLinks: { ...formData.socialLinks, medium: e.target.value } })} />
                             </div>
                         </div>
                     </div>
-                    <Button variant={"destructive"}>Save Changes</Button>
+                    <Button variant={"destructive"} disabled={isLoading}>Save Changes</Button>
                 </form>
             </div>
         </div>
