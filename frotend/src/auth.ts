@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async profile(profile) {
         return {
-          id: profile.sub,
+          _id: profile.sub,
           name: profile.name,
           email: profile.email,
           image: profile.picture,
@@ -39,7 +39,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async profile(profile) {
         return {
-          id: profile.sub,
+          _id: profile.sub,
           name: profile.name,
           email: profile.email,
           image: profile.avatar_url,
@@ -73,10 +73,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async session({ session, token }: {token : any, session: any}) {
-      session.user.id = token.sub as string;
-      session.user.role = token.role;
-      session.user.username = token.username;
-      // console.log("session", session);
+      if (token?.sub) {
+        const res = await fetch(`${baseURL}/user/profile`,  {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({id: token.sub})
+      });
+      const data = await res.json()
+        session.user = { ...data };
+        token.user = { ...data };
+      }
       return session;
     },
     async jwt({ token, user } : {token : any, user: any}) {
@@ -85,7 +93,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = user.role;
         token.username = user.username;
       }
-      console.log("token", user)
       return token;
     },
     

@@ -1,7 +1,6 @@
 import { getCurrentUser } from "@/actions";
 
 
-
 type RequestBody = {
     [key: string]: any;
   };

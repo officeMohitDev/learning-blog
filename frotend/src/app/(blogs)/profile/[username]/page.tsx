@@ -21,7 +21,7 @@ const getUserDetails = async (username: string) => {
     }
     const data = await res.json();
     console.log(data?.followers, session?.user?.id)
-    console.log("real user", data?.followers.find((follower) => follower._id === session?.user?.id))
+    console.log("real user", data)
     return { data, loggedInUser: session?.user?.email === data.email, currentUser: session?.user }
   } catch (error) {
     console.log(error)
@@ -47,8 +47,8 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
             </nav>
             <div className="mt-6 h-[calc(100svh-320px)] overflow-auto">
               {
-                data?.data?.savedPosts?.length ?
-                  data?.data.savedPosts?.map((post: any) => (
+                data?.data?.createdBlogs?.length ?
+                  data?.data.createdBlogs?.map((post: any) => (
                     <Article
                       key={post}
                       title="The Ultimate Guide to Making Sense of Data"
@@ -103,7 +103,7 @@ const ProfileCard = ({ data }) => (
         <h2 className="text-xl font-semibold">{data?.data?.name}</h2>
         <h2 className="text-[18px] text-gray-600">{data?.data?.followers?.length} Followers</h2>
         <div className=' max-w-[400px]'>
-          <p className="text-gray-500 text-[15px] hidden lg:flex">{data?.data?.about}</p>
+          <p className="text-gray-500 text-[15px] hidden lg:flex">{data?.data?.about.slice(0, 120)}...</p>
         </div>
         <div className='flex gap-4 w-full'>
           {

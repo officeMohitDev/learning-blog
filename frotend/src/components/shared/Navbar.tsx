@@ -7,25 +7,36 @@ import { usePathname } from "next/navigation"
 import { links } from "@/constants"
 import { getCurrentUser, getUserDetails } from "@/actions"
 import { useEffect, useState } from "react"
+import { User } from "next-auth"
 
-export default function Navbar() {
+export interface ExtendedUser extends User {
+  username: string;
+  location: string;
+  website: string;
+  about: string;
+  github: string;
+  twitter: string;
+  instagram: string;
+  medium: string;
+}
+
+
+
+export default function Navbar({ data }: { data: ExtendedUser | undefined }) {
   const [user, setUser] = useState<any>();
   const [userDB, setUserDB] = useState<any>()
   const getUser = async () => {
     const user: any = await getCurrentUser()
+    console.log(user, "user comming from db")
     setUser(user)
   }
 
-  const getUserDb = async () => {
-    const user = await getUserDetails()
-    console.log(user, "user comming from db")
-    setUserDB(user)
-  }
 
   useEffect(() => {
-    getUser();
-    getUserDb()
+    getUser()
   }, [])
+
+  console.log("userDB", data)
 
   const pathname = usePathname();
   return (
@@ -71,15 +82,15 @@ export default function Navbar() {
       <nav className="ml-auto hidden lg:flex gap-6">
         {
           links.map((link) => {
-            if (link.text === "Log In" && user) {
-              return user ? (
+            if (link.text === "Log In" && data) {
+              return data ? (
                 <Link
-                  href={`/profile/${userDB?.data?.username}`}
+                  href={`/profile/${data?.username}`}
                   key={25}
                   className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
                   prefetch={false}
                 >
-                  <img className="w-8 h-8 rounded-full ring-4 ring-white" src={userDB?.data?.image || "/images/noprofile.png"} alt={user.name} />
+                  <img className="w-8 h-8 rounded-full ring-4 ring-white" src={data?.image || "/images/noprofile.png"} alt={data.name} />
                 </Link>
               ) : (
                 <Link

@@ -15,6 +15,7 @@ import "./comp.css"
 import React, { FormEvent, useRef, useState } from 'react'
 import { baseURL } from '@/constants'
 import { SampleDatePicker } from './CustomDatePicker'
+import { toast } from 'sonner'
 
 interface SocialLinks {
     github: string;
@@ -126,10 +127,12 @@ const UserEdirForm = ({ data }: { data: any }) => {
 
             const result = await res.json();
             console.log("Success:", result);
+            toast.success("Successfully updated!!")
             setIsLoading(false)
         } catch (error) {
             console.error("Error:", error);
-            setIsLoading(false)
+            setIsLoading(false);
+            toast.error("Error while updating")
         }
     }
 
@@ -155,7 +158,7 @@ const UserEdirForm = ({ data }: { data: any }) => {
                         <div className='flex flex-col gap-4'>
                             <Label>Username</Label>
                             <div className='flex flex-col gap-2'>
-                                <Input value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} />
+                                <Input disabled={true} value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} />
                                 <p className="text-[14px] text-gray-600">This is your public display name. It can be your real name or a pseudonym.</p>
                             </div>
                         </div>

@@ -44,6 +44,7 @@ const SignInPage = () => {
     try {
       const res = await loginUser(formData)
       console.log("formdata", res)
+      router.push("/")
     } catch (error) {
       // Handle fetch errors
       console.error('Error submitting form:', error);

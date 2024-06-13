@@ -8,7 +8,7 @@ const fetchUserData = async () => {
     try {
         const session: any = await auth()
         const res = await getUserDetails()
-        return res?.data
+        return session.user
     } catch (error) {
         console.log(error)
         throw Error("Error while fetching the data")

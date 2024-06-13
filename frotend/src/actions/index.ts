@@ -24,6 +24,7 @@ export const getCurrentUser = async () => {
 export const getUserDetails = async() => {
     try {
         const session:any = await auth();
+        console.log(session)
         const res = await fetch(`${baseURL}/user/profile`,  {
             method: "POST",
             headers: {

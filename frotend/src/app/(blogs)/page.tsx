@@ -1,9 +1,11 @@
+import { signOut } from "@/auth";
 import BlogCard from "@/components/BlogCard";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
+
   return (
     <div className="w-screen min-h-screen flex flex-col">
       <div className="flex flex-col gap-6">
