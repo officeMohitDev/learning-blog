@@ -223,3 +223,20 @@ export const profileMe =  async (req: Request,
         next(error);
       }
     };
+
+
+export const getAuthorData = async(req: Request,
+  res: Response,
+  next: NextFunction) => {
+    try {
+      const authors = await User.find({role: "author"});
+      if (!authors.length) {
+        const error = createHttpError(404, "No author found")
+        return next(error)
+      }
+
+      res.status(200).json(authors)
+    } catch (error) {
+      next(error)
+    }
+  }

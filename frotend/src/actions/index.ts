@@ -16,9 +16,20 @@ export const loginWithGithub = async () => {
     await signIn("github")
   }
 
+  export interface ExtendedUser extends User {
+    username: string;
+    location: string;
+    website: string;
+    about: string;
+    github: string;
+    twitter: string;
+    instagram: string;
+    medium: string;
+  }
+
 export const getCurrentUser = async () => {
     const session = await auth();
-    return session?.user
+    return session?.user as ExtendedUser
 }
 
 export const getUserDetails = async() => {

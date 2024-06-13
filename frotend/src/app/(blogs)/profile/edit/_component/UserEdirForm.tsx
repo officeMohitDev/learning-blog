@@ -180,7 +180,7 @@ const UserEdirForm = ({ data }: { data: any }) => {
                         <div className='flex flex-col gap-4'>
                             <Label>Role</Label>
                             <div>
-                                <Select onValueChange={(e) => setFormData({ ...formData, role: e })}>
+                                <Select defaultValue={formData.role} onValueChange={(e) => setFormData({ ...formData, role: e })}>
                                     <SelectTrigger className="w-[180px]">
                                         <SelectValue placeholder="Select a Role" />
                                     </SelectTrigger>

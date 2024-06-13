@@ -4,11 +4,9 @@ import LogoutButton from '@/components/LogoutButton';
 import FollowButton from '@/components/buttons/FollowButton';
 import { Button } from '@/components/ui/button';
 import { baseURL } from '@/constants';
-import fetchWithHeaders from '@/utils/api';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
-
 
 
 const getUserDetails = async (username: string) => {
@@ -20,7 +18,6 @@ const getUserDetails = async (username: string) => {
       throw Error(data.message || "Error while fetching Data")
     }
     const data = await res.json();
-    console.log(data?.followers, session?.user?.id)
     console.log("real user", data)
     return { data, loggedInUser: session?.user?.email === data.email, currentUser: session?.user }
   } catch (error) {
@@ -31,7 +28,6 @@ const getUserDetails = async (username: string) => {
 
 const MediumProfile = async ({ params }: { params: { username: string } }) => {
   const data = await getUserDetails(params.username)
-
   return (
     <div className='w-full'>
       <div className="mx-auto py-6 lg:px-28 px-4 lg:mt-6">
@@ -103,7 +99,7 @@ const ProfileCard = ({ data }) => (
         <h2 className="text-xl font-semibold">{data?.data?.name}</h2>
         <h2 className="text-[18px] text-gray-600">{data?.data?.followers?.length} Followers</h2>
         <div className=' max-w-[400px]'>
-          <p className="text-gray-500 text-[15px] hidden lg:flex">{data?.data?.about.slice(0, 120)}...</p>
+          <p className="text-gray-500 text-[15px] hidden lg:flex">{data?.data?.about?.slice(0, 120)}...</p>
         </div>
         <div className='flex gap-4 w-full'>
           {
@@ -122,7 +118,7 @@ const ProfileCard = ({ data }) => (
       </div>
     </div>
     <div className="mt-6 w-full hidden lg:flex lg:flex-col">
-      <h3 className="text-lg font-semibold flex gap-4">Following <span className='text-[15px] text-gray-600'>{data?.data?.followers?.length}</span> </h3>
+      <h3 className="text-lg font-semibold flex gap-4">Following <span className='text-[15px] text-gray-600'>{data?.data?.following?.length}</span> </h3>
       <ul className="mt-2 space-y-2">
         {
           data?.data?.following?.map((follower: any) => (

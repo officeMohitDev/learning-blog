@@ -7,6 +7,7 @@ import { Blog } from "./blogModal";
 import { Tag } from "../tags/tagsModal";
 import fs from 'node:fs'
 import { User } from "../users/userModal";
+import getUserIdFromAuthorizationHeader from "../utils/token";
 
 interface AuthRequest extends Request {
     user: string;
@@ -19,7 +20,7 @@ export const createBlog = async (
 ) => {
     try {
         let _req = req as AuthRequest;
-        const user = _req.user;
+        const user = getUserIdFromAuthorizationHeader(req);
 
         const userDB = await User.findOne({_id: user});
 
@@ -42,7 +43,7 @@ export const createBlog = async (
 
         console.log(uploadResult)
 
-        const {title, subTitle, tags, content, posterImg} = _req.body;
+        const {title, subTitle, tags, content} = _req.body;
 
         const tagIds = await Promise.all(tags.map(async (tagName: any) => {
             let tag = await Tag.findOne({ name: tagName });

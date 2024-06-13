@@ -14,11 +14,11 @@ type RequestBody = {
     options: RequestInit = {}
   ): Promise<T> => {
     // Define common headers
-    const user = await getCurrentUser()
+    const user: any = await getCurrentUser()
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       // Add any other common headers here
-      'Authorization': `Bearer ${user?.id}`, // Assuming getToken() returns the token
+      'Authorization': `Bearer ${user?._id}`, // Assuming getToken() returns the token
     };
   
     // Merge common headers with options hea    ers, if provided

@@ -93,6 +93,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.role = user.role;
         token.username = user.username;
       }
+      console.log("token", token)
       return token;
     },
     

@@ -2,7 +2,7 @@
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { SearchIcon, SunIcon } from "lucide-react"
+import { SearchIcon, SunIcon, NotebookPen } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { links } from "@/constants"
 import { getCurrentUser, getUserDetails } from "@/actions"
@@ -64,7 +64,7 @@ export default function Navbar({ data }: { data: ExtendedUser | undefined }) {
             <button
               className="bg-transparent flex items-start justify-start -ml-4 p-3"
             >
-              <SunIcon color="black" />
+              <NotebookPen color="black" size={20} />
             </button>
             <button
               className="bg-transparent flex items-start justify-start -ml-4 p-3 "
@@ -114,11 +114,12 @@ export default function Navbar({ data }: { data: ExtendedUser | undefined }) {
           })
         }
 
-        <Button
+        <Link
+          href={"/write"}
           className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
         >
-          <SunIcon color="black" />
-        </Button>
+          <NotebookPen color="black" size={20} />
+        </Link>
         <Button
           className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus:bg-gray-800 dark:focus:text-gray-50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50"
         >
