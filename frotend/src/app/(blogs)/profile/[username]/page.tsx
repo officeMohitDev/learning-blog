@@ -91,7 +91,7 @@ const Article = ({ title, description, date, views, comments, imagePlaceholder }
   </article>
 );
 
-const ProfileCard = ({ data }) => (
+const ProfileCard = ({ data }: { data: any }) => (
   <div className="flex  flex-col items-start lg:items-start">
     <div className="flex lg:flex-col gap-4 items-center lg:items-start">
       <img src={data?.data?.image} className='w-16 h-16 rounded-full' alt="" />

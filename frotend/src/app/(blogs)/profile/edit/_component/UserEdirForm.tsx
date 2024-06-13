@@ -43,7 +43,7 @@ interface FormData {
 const UserEdirForm = ({ data }: { data: any }) => {
     const [date, setDate] = useState<Date>();
     const [isLoading, setIsLoading] = useState(false)
-    const filRef = useRef(null);
+    const filRef: any = useRef(null);
 
     const handleClickOnImage = () => {
         if (filRef.current) {
@@ -75,7 +75,6 @@ const UserEdirForm = ({ data }: { data: any }) => {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-
             setFormData((prevFormData) => ({
                 ...prevFormData,
                 image: e.target.files[0], // Set the selected file as the image
@@ -103,7 +102,7 @@ const UserEdirForm = ({ data }: { data: any }) => {
 
         // Handling nested socialLinks object
         if (formData.socialLinks) {
-            Object.keys(formData.socialLinks).forEach(key => {
+            Object.keys(formData.socialLinks).forEach((key) => {
                 if (formData.socialLinks[key]) {
                     formValues.append(`socialLinks[${key}]`, formData.socialLinks[key]);
                 }
@@ -226,7 +225,7 @@ const UserEdirForm = ({ data }: { data: any }) => {
                                     />
                                 </PopoverContent>
                             </Popover> */}
-                            <SampleDatePicker date={date} setDate={setDate} />
+                            <SampleDatePicker date={date as Date} setDate={setDate} />
                         </div>
                     </div>
                     <div className='flex flex-col gap-4'>
