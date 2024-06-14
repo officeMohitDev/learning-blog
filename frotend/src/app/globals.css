@@ -82,267 +82,179 @@
 }
 
 
-/* General styling for TinyMCE content */
 .tinymce-content {
-  font-family: 'Arial', sans-serif;
-  font-size: 1rem;
-  color: #333;
-  line-height: 1.6;
-  padding: 1rem;
+  @apply font-sans text-base text-gray-800 leading-relaxed md:p-4;
+
+  /* Specific styles for headings */
+}
+
+.tinymce-content h1 {
+  @apply text-4xl font-bold mt-8 mb-4 text-black;
+}
+
+.tinymce-content h2 {
+  @apply text-3xl font-bold mt-7 mb-4 text-black;
+}
+
+.tinymce-content h3 {
+  @apply text-2xl font-bold mt-6 mb-3 text-black;
+}
+
+.tinymce-content h4 {
+  @apply text-xl font-bold mt-5 mb-3 text-black;
+}
+
+.tinymce-content h5 {
+  @apply text-lg font-bold mt-4 mb-2 text-black;
+}
+
+.tinymce-content h6 {
+  @apply font-bold mt-3 mb-2 text-black;
 }
 
 /* Styling for paragraphs */
 .tinymce-content p {
-  margin-bottom: 1rem;
-}
-
-/* Styling for headers */
-.tinymce-content h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #000000;
-  /* Black color */
-}
-
-.tinymce-content h2 {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-top: 1.75rem;
-  margin-bottom: 1rem;
-  color: #000000;
-  /* Black color */
-}
-
-.tinymce-content h3 {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: #000000;
-  /* Black color */
-}
-
-.tinymce-content h4 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 1.25rem;
-  margin-bottom: 0.75rem;
-  color: #000000;
-  /* Black color */
-}
-
-.tinymce-content h5 {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  color: #000000;
-  /* Black color */
-}
-
-.tinymce-content h6 {
-  font-size: 1rem;
-  font-weight: bold;
-  margin-top: 0.75rem;
-  margin-bottom: 0.5rem;
-  color: #000000;
-  /* Black color */
+  @apply mb-4;
 }
 
 /* Styling for lists */
 .tinymce-content ul,
 .tinymce-content ol {
-  margin: 1rem 0;
-  padding-left: 2rem;
+  @apply my-4 pl-8;
 }
 
 .tinymce-content li {
-  margin-bottom: 0.5rem;
+  @apply mb-2;
 }
 
 /* Styling for blockquotes */
 .tinymce-content blockquote {
-  border-left: 4px solid #ccc;
-  padding-left: 1rem;
-  font-style: italic;
-  color: #666;
-  margin: 1rem 0;
-  background-color: #f9f9f9;
-  padding: 1rem;
-  border-radius: 4px;
+  @apply border-l-4 border-gray-300 italic text-gray-600 bg-gray-100 p-4 my-4 rounded;
 }
 
 /* Styling for links */
 .tinymce-content a {
-  color: #3498db;
-  text-decoration: underline;
+  @apply text-blue-500 underline;
 }
 
 .tinymce-content a:hover {
-  color: #d31a1a;
-  text-decoration: underline;
+  @apply text-red-600 underline;
 }
 
 /* Styling for images */
 .tinymce-content img {
-  max-width: 100%;
-  height: auto;
-  margin: 1rem 0;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  @apply max-w-full h-auto my-4 rounded-lg shadow-sm;
 }
 
 /* Styling for tables */
 .tinymce-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-  background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  @apply w-full border-collapse my-4 bg-white shadow-md;
 }
 
 .tinymce-content th,
 .tinymce-content td {
-  border: 1px solid #ddd;
-  padding: 0.5rem;
-  text-align: left;
+  @apply border border-gray-300 p-2 text-left;
 }
 
 .tinymce-content th {
-  background-color: #f9f9f9;
+  @apply bg-gray-200;
 }
 
 /* Styling for code */
 .tinymce-content code {
-  background-color: #f4f4f4;
-  padding: 0.2rem 0.4rem;
-  font-family: 'Courier New', Courier, monospace;
-  border-radius: 4px;
+  @apply bg-gray-200 p-1 font-mono rounded;
 }
 
 .tinymce-content pre {
-  background-color: #f4f4f4;
-  padding: 1rem;
-  overflow: auto;
-  font-family: 'Courier New', Courier, monospace;
-  border-radius: 4px;
-  margin: 1rem 0;
+  @apply bg-gray-200 p-4 overflow-auto rounded my-4 font-mono;
 }
 
 /* Styling for horizontal rules */
 .tinymce-content hr {
-  border: 0;
-  border-top: 1px solid #ccc;
-  margin: 2rem 0;
+  @apply border-t-2 border-gray-300 my-8;
 }
 
 /* Styling for emphasis and strong */
 .tinymce-content em {
-  font-style: italic;
+  @apply italic;
 }
 
 .tinymce-content strong {
-  font-weight: bold;
+  @apply font-bold;
 }
 
 /* Styling for subscript and superscript */
 .tinymce-content sub {
-  vertical-align: sub;
-  font-size: smaller;
+  @apply align-baseline text-sm;
 }
 
 .tinymce-content sup {
-  vertical-align: super;
-  font-size: smaller;
+  @apply align-top text-sm;
 }
 
 /* Styling for address */
 .tinymce-content address {
-  font-style: normal;
-  margin-bottom: 1rem;
+  @apply mb-4;
 }
 
 /* Styling for captions */
 .tinymce-content figcaption {
-  text-align: center;
-  font-size: 0.875rem;
-  color: #666;
-  margin-top: 0.5rem;
+  @apply text-center text-sm text-gray-600 mt-2;
 }
 
 /* Styling for figure */
 .tinymce-content figure {
-  margin: 0;
-  padding: 0;
-  display: table;
-  max-width: 100%;
-  text-align: center;
-  margin-bottom: 1rem;
+  @apply table max-w-full text-center my-4;
 }
 
 /* Styling for inline elements */
 .tinymce-content b {
-  font-weight: bold;
+  @apply font-bold;
 }
 
 .tinymce-content i {
-  font-style: italic;
+  @apply italic;
 }
 
 .tinymce-content u {
-  text-decoration: underline;
+  @apply underline;
 }
 
 /* Styling for highlights */
 .tinymce-content mark {
-  background-color: #ffff00;
-  color: #000;
+  @apply bg-yellow-200 text-black;
 }
 
 /* Styling for videos */
 .tinymce-content video {
-  max-width: 100%;
-  margin: 1rem 0;
-  display: block;
+  @apply max-w-full my-4;
 }
 
 /* Styling for audio */
 .tinymce-content audio {
-  max-width: 100%;
-  margin: 1rem 0;
-  display: block;
+  @apply max-w-full my-4;
 }
 
 /* Styling for iframes */
 .tinymce-content iframe {
-  max-width: 100%;
-  margin: 1rem 0;
-  border: none;
+  @apply max-w-full my-4 border-none;
 }
 
 /* Styling for details and summary */
 .tinymce-content details {
-  margin: 1rem 0;
-  padding: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 4px;
+  @apply my-4 p-4 bg-gray-100 rounded;
 }
 
 .tinymce-content summary {
-  font-weight: bold;
-  cursor: pointer;
+  @apply font-bold cursor-pointer;
 }
 
 /* Styling for progress bars */
 .tinymce-content progress {
-  width: 100%;
-  height: 1rem;
+  @apply w-full h-4 my-4;
 }
 
 /* Styling for meters */
 .tinymce-content meter {
-  width: 100%;
-  height: 1rem;
+  @apply w-full h-4 my-4;
 }

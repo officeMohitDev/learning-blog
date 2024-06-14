@@ -11,12 +11,12 @@ interface Formdata {
 
 export const loginWithGoogle = async () => {
     await signIn("google")
-  }
+}
 export const loginWithGithub = async () => {
     await signIn("github")
-  }
+}
 
-  export interface ExtendedUser extends User {
+export interface ExtendedUser extends User {
     username: string;
     location: string;
     website: string;
@@ -25,29 +25,30 @@ export const loginWithGithub = async () => {
     twitter: string;
     instagram: string;
     medium: string;
-  }
+    _id: string
+}
 
 export const getCurrentUser = async () => {
     const session = await auth();
     return session?.user as ExtendedUser
 }
 
-export const getUserDetails = async() => {
+export const getUserDetails = async () => {
     try {
-        const session:any = await auth();
+        const session: any = await auth();
         console.log(session)
-        const res = await fetch(`${baseURL}/user/profile`,  {
+        const res = await fetch(`${baseURL}/user/profile`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({id: session.user.id})
+            body: JSON.stringify({ id: session.user.id })
         });
         const data = await res.json();
         return { data, loggedInUser: session?.user?.email === data.email }
-      } catch (error) {
+    } catch (error) {
         console.log(error)
-      }
+    }
 }
 
 
@@ -61,14 +62,14 @@ export const loginUser = async (formdata: Formdata) => {
         });
 
     } catch (error) {
-         if (error instanceof AuthError) {
+        if (error instanceof AuthError) {
             switch (error.type) {
-                case "CredentialsSignin": 
-                return { msg: "wrong", status: "error" };
+                case "CredentialsSignin":
+                    return { msg: "wrong", status: "error" };
                 default:
-                return { msg: "Something went wrong", status: "error" };
+                    return { msg: "Something went wrong", status: "error" };
             }
-         }
-         throw error
+        }
+        throw error
     }
 };

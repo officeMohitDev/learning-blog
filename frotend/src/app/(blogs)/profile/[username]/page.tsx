@@ -133,7 +133,7 @@ const ProfileCard = ({ data }: { data: any }) => (
                 <LogoutButton mobile={false} />
               </>
             ) : (
-              <FollowButton data={data} />
+              <FollowButton mobile={false} data={data} />
             )
           }
         </div>
@@ -168,7 +168,7 @@ const ProfileCard = ({ data }: { data: any }) => (
           <LogoutButton mobile={true} />
         </div>
       ) : (
-        <Button className="flex mt-6 w-full lg:hidden md:hidden lg:justify-center bg-[#EF4444] hover:bg-[#EF4444]/80 text-white">Follow</Button>
+        <FollowButton mobile={true} data={data} />
       )
     }
   </div>
