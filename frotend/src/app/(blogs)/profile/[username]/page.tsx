@@ -47,10 +47,11 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
                 data?.blog?.length ?
                   data?.blog?.map((post: any) => (
                     <Article
-                      key={post}
+                      key={post._id}
+                      id={post._id}
                       title={post.title}
                       description={post.subTitle}
-                      views="517"
+                      likes={post.likes.length}
                       comments={post.comments.length}
                       img={post.posterImg}
                       createdAt={post.createdAt}
@@ -71,12 +72,13 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
   );
 };
 
-const Article = ({ title, description, views, comments, img, createdAt }: {
+const Article = ({ title, description, likes, comments, img, createdAt, id }: {
   title: string;
   description: string;
-  views: string;
+  likes: string | number;
   comments: string;
   img: string;
+  id: string;
   createdAt: string; // assuming createdAt is the creation date of the post
 }) => {
   // Calculate the difference between the creation date and current date
@@ -96,12 +98,12 @@ const Article = ({ title, description, views, comments, img, createdAt }: {
     <article className="mb-8 flex justify-between">
       <div className='max-w-[50rem] flex flex-col justify-between'>
         <div>
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <Link href={`/blog/${id}`} className="text-xl font-semibold">{title}</Link>
           <p className="text-gray-600 text-[16px]">{description}</p>
         </div>
         <div className="flex items-center text-gray-500 mt-2 space-x-4">
           <span>{formattedDate}</span> {/* Display formatted date */}
-          <span>{views}</span>
+          <span>{likes}</span>
           <span>{comments}</span>
         </div>
       </div>

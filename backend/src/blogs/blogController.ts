@@ -79,7 +79,7 @@ export const createBlog = async (req: Request, res: Response, next: NextFunction
 
 export const allBlogs = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const blogs = await Blog.find({});
+        const blogs = await Blog.find({}).populate("author").populate("likes").populate("tags");
         if (!blogs) {
             const err = createHttpError(404, "No blogs created");
             return next(err)
