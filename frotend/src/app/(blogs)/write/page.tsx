@@ -1,6 +1,6 @@
 "use client";
 import { Button } from '@/components/ui/button';
-import React, { FormEvent, useRef, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { PublishBlogModal } from './_component/page';
 import {
@@ -16,54 +16,34 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import MultipleSelectorCreatable from './_component/ShadSelect';
 import { title } from 'process';
-const FRAMEWORKS = [
-    {
-        value: "next.js",
-        key: "Next.js",
-    },
-    {
-        value: "sveltekit",
-        key: "SvelteKit",
-    },
-    {
-        value: "nuxt.js",
-        key: "Nuxt.js",
-    },
-    {
-        value: "remix",
-        key: "Remix",
-    },
-    {
-        value: "astro",
-        key: "Astro",
-    },
-    {
-        value: "wordpress",
-        key: "WordPress",
-    },
-    {
-        value: "express.js",
-        key: "Express.js",
-    },
-    {
-        value: "nest.js",
-        key: "Nest.js",
-    },
-]
+import { baseURL } from '@/constants';
+import fetchWithHeaders from '@/utils/api';
+import { ExtendedUser, getCurrentUser } from '@/actions';
+import { toast } from 'sonner';
 
 interface BlogData {
     title: string;
     subTitle: string;
-    tags: {
-        value: string;
-        label: string
-    }[],
+    tags: any[],
     content: string;
     posterImg: File | null
 }
 
 const WritePage = () => {
     const [content, setContent] = useState("");
+    const [isLoading, setIsLoading] = useState(false)
+    const [userSession, setUserSession] = useState<any>();
+
+
+    const fetchUserData = async () => {
+        const data = await getCurrentUser()
+        setUserSession(data)
+    }
+
+    useEffect(() => {
+        fetchUserData()
+    }, [])
+
     const [open, setOpen] = useState(false);
     const [blogData, setBlogData] = useState<BlogData>({
         title: "",
@@ -85,22 +65,57 @@ const WritePage = () => {
         setContent(content);
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setIsLoading(true)
         console.log("content", blogData);
+        try {
+            const formData = new FormData();
+            formData.append("title", blogData.title);
+            formData.append("subTitle", blogData.subTitle);
+            blogData.tags.forEach(tag => formData.append("tags", tag)); // Append each tag individually
+            formData.append("content", blogData.content);
+            if (blogData.posterImg) {
+                formData.append("posterImg", blogData.posterImg);
+            }
+
+            const res = await fetch(`${baseURL}/blog/create`, {
+                method: "POST",
+                headers: {
+                    'Authorization': `Bearer ${userSession?._id}`
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                const data = await res.json();
+                toast.error(JSON.stringify(data))
+                return
+            }
+
+            setIsLoading(false)
+            toast.success("Blog Created sucessfully!")
+            setBlogData({
+                title: "",
+                subTitle: "",
+                tags: [],
+                content: "",
+                posterImg: null
+            })
+            setOpen(false);
+
+            console.log("Response:", res);
+        } catch (error) {
+            setIsLoading(false)
+            console.error("Error:", error);
+        }
     };
-
-    const printBlogObj = () => {
-        console.log("blogData", blogData)
-    }
-
-
 
 
     return (
         <div className='min-h-screen flex flex-col gap-4 md:px-24 mt-6'>
             <div className='w-full justify-end flex'>
-                <Dialog>
+                <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
                         <Button variant="destructive" disabled={blogData.content.length > 200 ? false : true}>Publish</Button>
                     </DialogTrigger>
@@ -140,7 +155,7 @@ const WritePage = () => {
                             </div>
                             <div className="">
                                 <Label htmlFor="posterImg" className="text-right">
-                                    Poster Image
+                                    Poster Imagessss
                                 </Label>
                                 <Input required id="posterImg" type="file" name="posterImg" onChange={e => setBlogData({ ...blogData, posterImg: e.target.files[0] })} />
                             </div>
@@ -152,7 +167,7 @@ const WritePage = () => {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit" onClick={handleSubmit} >Save changes</Button>
+                            <Button type="submit" onClick={handleSubmit} disabled={isLoading} >Save changes</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
@@ -212,7 +227,6 @@ const WritePage = () => {
                 onEditorChange={handleEditorChange}
             />
             <button onClick={log}>Log editor content</button>
-            <PublishBlogModal open={open} setOpen={setOpen} />
         </div>
     );
 };

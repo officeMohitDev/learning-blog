@@ -8,7 +8,10 @@ import cors from 'cors'
 
 const app = express();
 app.use(express.json());
-app.use(cors())
+app.use(cors({
+  origin: true
+}))
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cookieParser());
 // app.use(bodyParser.json())
 app.get("/", (req, res) => {

@@ -22,7 +22,8 @@ const blogSchema = new mongoose.Schema({
         required: true
     },
     tags: [{
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tag"
     }],
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
