@@ -12,6 +12,7 @@ import fs from 'fs'
 import { userUpdateSchema } from "../validators/user-validator";
 import getUserIdFromAuthorizationHeader from "../utils/token";
 import { ObjectId } from "mongoose";
+import { Blog } from "../blogs/blogModal";
 
 export const registerUser = async (
   req: Request,
@@ -95,7 +96,11 @@ export const getUserDetails = async (
       const error = createHttpError(404, "User not found");
       return next(error)
     }
-    res.status(200).json(user)
+
+    const blog = await Blog.find({author: user._id})
+    res.status(200).json({
+      user, blog
+    })
   } catch (error) {
     next(error)
   }

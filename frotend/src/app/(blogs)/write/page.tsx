@@ -155,9 +155,12 @@ const WritePage = () => {
                             </div>
                             <div className="">
                                 <Label htmlFor="posterImg" className="text-right">
-                                    Poster Imagessss
+                                    Poster Image
                                 </Label>
-                                <Input required id="posterImg" type="file" name="posterImg" onChange={e => setBlogData({ ...blogData, posterImg: e.target.files[0] })} />
+                                <Input required id="posterImg" type="file" name="posterImg" onChange={e => {
+                                    if (!e.target.files) return;
+                                    setBlogData({ ...blogData, posterImg: e.target.files[0] })
+                                }} />
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Label htmlFor="username" className="">
