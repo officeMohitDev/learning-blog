@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 
 const fetchSingleBlogData = async (id: string) => {
     try {
-        const res = await fetch(`${baseURL}/blog/${id}`);
+        const res = await fetch(`${baseURL}/blog/${id}`, { cache: "no-store" });
         if (!res.ok) {
             const data = await res.json()
             console.log(data)

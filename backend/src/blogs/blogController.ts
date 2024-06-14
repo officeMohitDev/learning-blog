@@ -8,6 +8,7 @@ import { Tag } from "../tags/tagsModal";
 import fs from 'node:fs'
 import { User } from "../users/userModal";
 import getUserIdFromAuthorizationHeader from "../utils/token";
+import mongoose from "mongoose";
 
 interface AuthRequest extends Request {
     user: string;
@@ -107,3 +108,42 @@ export const singleBlog = async (req: Request, res: Response, next: NextFunction
         next(error)
     }
 }
+
+
+export const likeOrUnlikeBlog = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const blogId = req.params.blogId;
+        const userId = getUserIdFromAuthorizationHeader(req); // Assuming this function retrieves userId properly
+
+        const blog = await Blog.findById(blogId);
+
+        if (!blog) {
+            const error = createHttpError(404, "No Blog Found");
+            return next(error);
+        }
+
+        const isLiked = blog.likes.some((likeId: mongoose.Types.ObjectId) => likeId.equals(userId));
+
+        let updateBlog;
+        let message;
+
+        if (isLiked) {
+            updateBlog = await Blog.findByIdAndUpdate(blogId, {
+                $pull: { likes: userId }
+            }, { new: true });
+            message = "Blog Unliked";
+        } else {
+            updateBlog = await Blog.findByIdAndUpdate(blogId, {
+                $addToSet: { likes: userId }
+            }, { new: true });
+            message = "Blog Liked";
+        }
+
+        res.status(200).json({
+            message,
+            blog: updateBlog
+        });
+    } catch (error) {
+        next(error);
+    }
+};
