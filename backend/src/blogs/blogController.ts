@@ -16,7 +16,7 @@ interface AuthRequest extends Request {
 export const createBlog = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = getUserIdFromAuthorizationHeader(req);
-        const userDB = await User.findOne({_id: user});
+        const userDB = await User.findOne({ _id: user });
 
         console.log("user id-===========", user)
 
@@ -75,3 +75,17 @@ export const createBlog = async (req: Request, res: Response, next: NextFunction
         res.status(500).send('Internal Server Error'); // Send a generic error response
     }
 };
+
+
+export const allBlogs = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const blogs = await Blog.find({});
+        if (!blogs) {
+            const err = createHttpError(404, "No blogs created");
+            return next(err)
+        }
+        res.status(200).json(blogs)
+    } catch (error) {
+        next(error)
+    }
+}
