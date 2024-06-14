@@ -89,3 +89,21 @@ export const allBlogs = async (req: Request, res: Response, next: NextFunction) 
         next(error)
     }
 }
+
+export const singleBlog = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const blogid = req.params.blogId
+        const blog = await Blog.findById(blogid).populate("author").populate("likes").populate("tags");
+
+        if (!blog) {
+            const error = createHttpError(404, "No Blog Found")
+            return next(error)
+        }
+
+
+        res.status(200).json(blog)
+
+    } catch (error) {
+        next(error)
+    }
+}
