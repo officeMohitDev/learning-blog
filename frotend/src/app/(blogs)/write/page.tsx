@@ -181,6 +181,7 @@ const WritePage = () => {
                 init={{
                     selector: 'textarea#open-source-plugins',
                     plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks  fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
+                    content_css: 'writer',
                     editimage_cors_hosts: ['picsum.photos'],
                     menubar: 'file edit view insert format tools table help',
                     toolbar: "undo redo | accordion accordionremove | blocks fontfamily fontsize | bold italic underline strikethrough | align numlist bullist | link image | table media | lineheight outdent indent| forecolor backcolor removeformat | charmap emoticons | code fullscreen preview | save print | pagebreak anchor codesample | ltr rtl",

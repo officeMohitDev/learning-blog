@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const fetchAllBlogs = async () => {
   try {
-    const res = await fetch(`${baseURL}/blog/all`);
+    const res = await fetch(`${baseURL}/blog/all`, { cache: "no-store" });
     const data = await res.json();
     return data
   } catch (error) {
