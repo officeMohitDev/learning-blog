@@ -1,10 +1,23 @@
 import { signOut } from "@/auth";
 import BlogCard from "@/components/BlogCard";
 import { Button } from "@/components/ui/button";
+import { baseURL } from "@/constants";
 import Image from "next/image";
 import Link from "next/link";
 
+const fetchAllBlogs = async () => {
+  try {
+    const res = await fetch(`${baseURL}/blog/all`, { cache: "no-store" });
+    const data = await res.json();
+    return data
+  } catch (error) {
+    throw Error("Something went wrong")
+  }
+}
+
 export default async function Home() {
+
+  const allBlogs = await fetchAllBlogs()
 
   return (
     <div className="w-screen min-h-screen flex flex-col">
@@ -29,11 +42,12 @@ export default async function Home() {
           <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Personal</Link>
           <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Experiences</Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-1 place-items-center md:place-items-start lg:grid-cols-3 md:px-24 px-3 gap-14 bg-[#FEFEFE]">
-          <BlogCard />
-          <BlogCard />
-          <BlogCard />
-          <BlogCard />
+        <div className="grid grid-cols-1 place-items-center md:place-items-start md:grid-cols-2 md:px-24 px-3 gap-14 bg-[#FEFEFE]">
+          {
+            allBlogs.map((blog: any) => (
+              <BlogCard key={blog._id} blog={blog} />
+            ))
+          }
         </div>
       </div>
     </div>

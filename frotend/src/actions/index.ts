@@ -2,7 +2,7 @@
 
 import { auth, signIn } from "@/auth"
 import { baseURL } from "@/constants"
-import { AuthError } from "next-auth"
+import { AuthError, User } from "next-auth"
 
 interface Formdata {
     email: string,

@@ -4,6 +4,7 @@ import LogoutButton from '@/components/LogoutButton';
 import FollowButton from '@/components/buttons/FollowButton';
 import { Button } from '@/components/ui/button';
 import { baseURL } from '@/constants';
+import { format, formatDistanceToNow } from 'date-fns';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
@@ -19,7 +20,7 @@ const getUserDetails = async (username: string) => {
     }
     const data = await res.json();
     console.log("real user", data)
-    return { data, loggedInUser: session?.user?.email === data.email, currentUser: session?.user }
+    return { data: data.user, loggedInUser: session?.user?.email === data.user.email, currentUser: session?.user, blog: data.blog }
   } catch (error) {
     console.log(error)
     throw new Error("error")
@@ -43,16 +44,17 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
             </nav>
             <div className="mt-6 h-[calc(100svh-320px)] overflow-auto">
               {
-                data?.data?.createdBlogs?.length ?
-                  data?.data.createdBlogs?.map((post: any) => (
+                data?.blog?.length ?
+                  data?.blog?.map((post: any) => (
                     <Article
-                      key={post}
-                      title="The Ultimate Guide to Making Sense of Data"
-                      description="Lessons from 10 years at Uber, Meta and High-Growth Startups lorem23 Lessons from 10 years at Uber, Meta and High-Growth Startups lorem23Lessons from 10  Startups lorem23"
-                      date="4d ago"
-                      views="517"
-                      comments="12"
-                      imagePlaceholder
+                      key={post._id}
+                      id={post._id}
+                      title={post.title}
+                      description={post.subTitle}
+                      likes={post.likes.length}
+                      comments={post.comments.length}
+                      img={post.posterImg}
+                      createdAt={post.createdAt}
                     />
                   )) : (
                     <h1>No Posts to display</h1>
@@ -70,27 +72,47 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
   );
 };
 
-const Article = ({ title, description, date, views, comments, imagePlaceholder }: { title: String; description: String; date: String; views: String; comments: String; imagePlaceholder: Boolean }) => (
-  <article className="mb-8 flex justify-between">
-    <div className='max-w-[50rem] flex flex-col justify-between'>
-      <div>
-        <h2 className="text-xl font-semibold">{title}</h2>
-        <p className="text-gray-600 text-[16px]">{description}</p>
-      </div>
-      <div className="flex items-center text-gray-500 mt-2 space-x-4">
-        <span>{date}</span>
-        <span>{views}</span>
-        <span>{comments}</span>
-      </div>
-    </div>
-    {imagePlaceholder && (
-      <div className='p-4'>
-        <img src="/images/blogHero.jpg" alt="" className='lg:max-w-[16rem] max-w-32' />
-      </div>
-    )}
-  </article>
-);
+const Article = ({ title, description, likes, comments, img, createdAt, id }: {
+  title: string;
+  description: string;
+  likes: string | number;
+  comments: string;
+  img: string;
+  id: string;
+  createdAt: string; // assuming createdAt is the creation date of the post
+}) => {
+  // Calculate the difference between the creation date and current date
+  const createdAtDate = new Date(createdAt);
+  const now = new Date();
+  const distanceToNow = formatDistanceToNow(createdAtDate);
 
+  // Function to format date in dd-mm-yyyy format
+  const formatDate = (date: Date) => format(date, 'dd-MM-yyyy');
+
+  // Determine how to display the date based on its age
+  const formattedDate = now.getTime() - createdAtDate.getTime() < 7 * 24 * 60 * 60 * 1000
+    ? `${distanceToNow} ago`
+    : formatDate(createdAtDate);
+
+  return (
+    <article className="mb-8 flex justify-between">
+      <div className='max-w-[50rem] flex flex-col justify-between'>
+        <div>
+          <Link href={`/blog/${id}`} className="text-xl font-semibold">{title}</Link>
+          <p className="text-gray-600 text-[16px]">{description}</p>
+        </div>
+        <div className="flex items-center text-gray-500 mt-2 space-x-4">
+          <span>{formattedDate}</span> {/* Display formatted date */}
+          <span>{likes}</span>
+          <span>{comments}</span>
+        </div>
+      </div>
+      <div className='p-4'>
+        <img src={img} alt="" className='lg:max-w-[16rem] max-w-32' />
+      </div>
+    </article>
+  );
+};
 const ProfileCard = ({ data }: { data: any }) => (
   <div className="flex  flex-col items-start lg:items-start">
     <div className="flex lg:flex-col gap-4 items-center lg:items-start">
