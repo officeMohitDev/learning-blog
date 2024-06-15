@@ -1,28 +1,24 @@
 "use client"
-import React, { useState } from 'react'
-import LikeUnlikeButton from '../buttons/LikeUnlikeButton'
-import { MessageCircleIcon } from 'lucide-react'
-import { baseURL } from '@/constants'
-import { toast } from 'sonner'
-
-
-
-const comments = [
-    {
-        id: 1,
-        name: 'Alex Plutau',
-        username: 'packagemain.tech',
-        date: 'Jun 7',
-        content: "We use Redis very often, over time we noticed that it's also to pay attention to how you name your keys, so it's easier to do invalidations and share cache between multiple services/teams - https://packagemain.tech/p/unified-namespaced-cache-keys",
-        avatar: 'https://via.placeholder.com/50',
-    },
-]
-
+import React, { useState, useEffect, FormEvent } from 'react';
+import LikeUnlikeButton from '../buttons/LikeUnlikeButton';
+import { MessageCircleIcon } from 'lucide-react';
+import { baseURL } from '@/constants';
+import { toast } from 'sonner';
+import { formateBlogDate } from '@/utils/datefun';
+import { formatComments } from '@/lib/utils';
 
 const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     const [isLiked, setIsLiked] = useState(blogData.likes.find((like: any) => like._id === user._id));
-    const [blog, setBlog] = useState(blogData)
-    console.log("is it like or not", isLiked)
+    const [blog, setBlog] = useState(blogData);
+    const [formattedComments, setFormattedComments] = useState<any[]>([]);
+    const [commentMsg, setCommentMsg] = useState("")
+
+    useEffect(() => {
+        if (blog.comments) {
+            const formatted = formatComments(blog.comments);
+            setFormattedComments(formatted);
+        }
+    }, [blog]);
 
     const likeBlogPost = async () => {
         try {
@@ -30,34 +26,59 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 method: "PATCH",
                 headers: {
                     'Content-Type': 'application/json',
-                    // Add any other common headers here
                     'Authorization': `Bearer ${user?._id}`,
                 }
-            })
+            });
             if (!res.ok) {
-                toast.error("Unexpected error")
+                toast.error("Unexpected error");
             }
             const data = await res.json();
-            console.log("blog update data", data);
-            setBlog(data.blog)
-            setIsLiked(data.message === "Blog Liked" ? true : false)
-            toast.success(data.message === "Blog Liked" ? "Post Liked 💘" : "Post Unliked 💔")
-            return res
+            setBlog(data.blog);
+            setIsLiked(data.message === "Blog Liked" ? true : false);
+            toast.success(data.message === "Blog Liked" ? "Post Liked 💘" : "Post Unliked 💔");
+            return res;
+        } catch (error) {
+            console.log(error);
+            toast.error("Something went wrong");
+        }
+
+    };
+
+    const sendComment = async (e: FormEvent) => {
+        e.preventDefault()
+        try {
+            const res = await fetch(`${baseURL}/comment/create/${blog._id}`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?._id}`,
+                },
+                body: JSON.stringify({
+                    commentMsg,
+                    pinned: false,
+                    isNested: false
+                })
+            })
+            if (res.ok) {
+                toast.success("comment added");
+                const data = await res.json();
+                console.log("commented blog", data)
+                setBlog(data.blog);
+                setCommentMsg("")
+            }
+            return
         } catch (error) {
             console.log(error)
-            toast.error("Something went wrong")
         }
     }
 
-    return blog ? (
+    return (
         <div className="max-w-3xl mx-auto p-4">
             <div className="flex items-center space-x-2 pb-4 border-b">
                 {/* Placeholder for user avatars */}
-                {
-                    blog.likes.map((user: any) => {
-                        return <img key={user._id} src={user?.image || "/images/noprofile.png"} alt="User avatar" className="w-8 h-8 rounded-full" />
-                    })
-                }
+                {blog.likes.map((user: any) => (
+                    <img key={user._id} src={user?.image || "/images/noprofile.png"} alt="User avatar" className="w-8 h-8 rounded-full" />
+                ))}
                 <span className="text-sm">{blog.likes.length} Likes • {blog.comments.length} Comments</span>
             </div>
             <div className="mt-4 flex space-x-4 pb-4 border-b">
@@ -74,22 +95,27 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 <h2 className="text-xl font-bold">{blog.comments.length} Comment</h2>
                 <div className="mt-2 flex items-start space-x-2">
                     <img src={user.image} alt="User avatar" className="w-12 h-12 rounded-full" />
-                    <textarea
-                        className="flex-1 border rounded p-2"
-                        placeholder="Write a comment..."
-                    />
+                    <form className='w-full' onSubmit={sendComment}>
+                        <input
+                            className="flex-1 w-full border rounded p-2"
+                            placeholder="Write a comment..."
+                            value={commentMsg}
+                            onChange={e => setCommentMsg(e.target.value)}
+                        />
+                    </form>
+
                 </div>
             </div>
             <div className="mt-4">
-                {comments.map((comment) => (
-                    <div key={comment.id} className="flex space-x-2 py-4 border-b">
-                        <img src={comment.avatar} alt="User avatar" className="w-12 h-12 rounded-full" />
+                {formattedComments?.map((comment: any) => (
+                    <div key={comment._id} className="flex space-x-2 py-4 border-b">
+                        <img src={comment?.commentor?.image} alt="User avatar" className="w-12 h-12 rounded-full" />
                         <div className="flex-1">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <span className="font-bold">{comment.name}</span>{' '}
-                                    <span className="text-gray-500">@{comment.username}</span>{' '}
-                                    <span className="text-gray-500 text-sm">{comment.date}</span>
+                                    <span className="font-bold">{comment?.commentor?.name}</span>{' '}
+                                    <span className="text-gray-500">@{comment?.commentor?.username}</span>{' '}
+                                    <span className="text-gray-500 text-sm">{formateBlogDate(comment?.createdAt)}</span>
                                 </div>
                                 <div className="flex space-x-2 text-gray-500">
                                     <button>Like</button>
@@ -97,15 +123,30 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                     <button>Share</button>
                                 </div>
                             </div>
-                            <p className="mt-2">{comment.content}</p>
+                            <p className="mt-2">{comment?.comment}</p>
+                            {comment?.replies?.length > 0 && (
+                                <div className="ml-1 mt-2 space-y-2">
+                                    {comment?.replies?.map((reply: any) => (
+                                        <div key={reply._id} className="flex space-x-2 mt-6">
+                                            <img src={reply?.commentor?.image} alt="User avatar" className="w-10 h-10 rounded-full" />
+                                            <div>
+                                                <div>
+                                                    <span className="font-bold">{reply?.commentor?.name}</span>{' '}
+                                                    <span className="text-gray-500">@{reply?.commentor?.username}</span>{' '}
+                                                    <span className="text-gray-500 text-sm">{formateBlogDate(reply?.createdAt)}</span>
+                                                </div>
+                                                <p className="mt-1">{reply?.comment}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}
             </div>
         </div>
-    ) : (
-        <h1>BLog</h1>
-    )
-}
+    );
+};
 
-export default BlogStat
+export default BlogStat;

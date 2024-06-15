@@ -94,7 +94,15 @@ export const allBlogs = async (req: Request, res: Response, next: NextFunction) 
 export const singleBlog = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const blogid = req.params.blogId
-        const blog = await Blog.findById(blogid).populate("author").populate("likes").populate("tags");
+        const blog = await Blog.findById(blogid).populate("author").populate("likes").populate("tags").populate({
+            path: 'comments',
+            populate: {
+                path: 'commentor', // Populate the commentor field in each comment
+                model: 'User', // Assuming 'User' is the name of your User model
+                select: 'username name image'
+            }
+        });
+
 
         if (!blog) {
             const error = createHttpError(404, "No Blog Found")
@@ -130,12 +138,12 @@ export const likeOrUnlikeBlog = async (req: Request, res: Response, next: NextFu
         if (isLiked) {
             updateBlog = await Blog.findByIdAndUpdate(blogId, {
                 $pull: { likes: userId }
-            }, { new: true });
+            }, { new: true }).populate("author").populate("likes");
             message = "Blog Unliked";
         } else {
             updateBlog = await Blog.findByIdAndUpdate(blogId, {
                 $addToSet: { likes: userId }
-            }, { new: true });
+            }, { new: true }).populate("author").populate("likes");
             message = "Blog Liked";
         }
 
