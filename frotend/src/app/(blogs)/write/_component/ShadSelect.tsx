@@ -30,7 +30,7 @@ const MultipleSelectorCreatable = ({ setBlogData }: { setBlogData: any }) => {
                 defaultOptions={OPTIONS}
                 className='w-full'
                 onChange={(e) => getActualValues(e)}
-                placeholder="Type something that does not exist in dropdowns..."
+                placeholder="Select Tags"
                 creatable
                 emptyIndicator={
                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">

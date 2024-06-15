@@ -73,8 +73,11 @@ const UserEdirForm = ({ data }: { data: any }) => {
         website: data?.website
     })
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: any) => {
         if (e.target.files && e.target.files[0]) {
+            if (!e.target.files) {
+                return
+            }
             setFormData((prevFormData) => ({
                 ...prevFormData,
                 image: e.target.files[0], // Set the selected file as the image
@@ -103,8 +106,8 @@ const UserEdirForm = ({ data }: { data: any }) => {
         // Handling nested socialLinks object
         if (formData.socialLinks) {
             Object.keys(formData.socialLinks).forEach((key) => {
-                if (formData.socialLinks[key]) {
-                    formValues.append(`socialLinks[${key}]`, formData.socialLinks[key]);
+                if (formData.socialLinks[key as keyof typeof formData.socialLinks]) {
+                    formValues.append(`socialLinks[${key}]`, formData.socialLinks[key as keyof typeof formData.socialLinks]);
                 }
             });
         }

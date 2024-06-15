@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import ShadMultiSelect from "./ShadSelect"
 import MultipleSelectorCreatable from "./ShadSelect"
+import { useState } from "react"
 
 const FRAMEWORKS = [
     {
@@ -50,6 +51,7 @@ const FRAMEWORKS = [
 ]
 
 export function PublishBlogModal({ open, setOpen }: { open: boolean | undefined; setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
+    const [blogData, setBlogData] = useState()
     return (
         <Dialog open={open} onOpenChange={() => setOpen(false)}>
 
@@ -78,7 +80,6 @@ export function PublishBlogModal({ open, setOpen }: { open: boolean | undefined;
                         </Label>
                         <Input
                             id="username"
-                            defaultValue="@peduarte"
                             className="col-span-3"
                         />
                     </div>
@@ -92,7 +93,7 @@ export function PublishBlogModal({ open, setOpen }: { open: boolean | undefined;
                         <Label htmlFor="username" className="">
                             Tags
                         </Label>
-                        <MultipleSelectorCreatable />
+                        <MultipleSelectorCreatable setBlogData={setBlogData} />
                     </div>
                 </div>
                 <DialogFooter>
