@@ -179,7 +179,6 @@ const WritePage = () => {
                 apiKey='71xbw8jhvu6pctdhf63buikt62zy3fjkenx7oc1qb35st8bl'
                 initialValue="<p>This is the initial content of the editor.</p>"
                 init={{
-                    selector: 'textarea#open-source-plugins',
                     plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks  fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
                     content_css: 'writer',
                     editimage_cors_hosts: ['picsum.photos'],

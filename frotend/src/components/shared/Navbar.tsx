@@ -90,7 +90,7 @@ export default function Navbar({ data }: { data: ExtendedUser | undefined }) {
                   className={`group inline-flex h-9 w-max items-center justify-center rounded-md  px-4 py-2 text-sm font-medium transition-colors data-[active]:bg-gray-100/50 data-[state=open]:bg-gray-100/50 dark:data-[active]:bg-gray-800/50 dark:data-[state=open]:bg-gray-800/50`}
                   prefetch={false}
                 >
-                  <img className="w-8 h-8 rounded-full ring-4 ring-white" src={data?.image || "/images/noprofile.png"} alt={data.name} />
+                  <img className="w-8 h-8 rounded-full ring-4 ring-white" src={data?.image || "/images/noprofile.png"} alt={data.name || "image"} />
                 </Link>
               ) : (
                 <Link
