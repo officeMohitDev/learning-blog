@@ -7,11 +7,15 @@ import { toast } from 'sonner';
 import { formateBlogDate } from '@/utils/datefun';
 import { formatComments } from '@/lib/utils';
 import { Button } from '../ui/button';
+import Link from 'next/link';
+import { fetchSingleBlogData } from '@/app/(blogs)/blog/[slug]/page';
 
 const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
-    const [isLiked, setIsLiked] = useState(blogData.likes.find((like: any) => like._id === user._id));
+    const [isLiked, setIsLiked] = useState(user ? blogData.likes.find((like: any) => like._id === user._id) : false);
     const [blog, setBlog] = useState(blogData);
     const [formattedComments, setFormattedComments] = useState<any[]>([]);
+    const [loaderReply, setLoaderReply] = useState(false)
+    const [loaderComment, setLoaderComment] = useState(false)
     const [replyBox, setReplyBox] = useState(false);
     const [topCommentId, setTopCommentId] = useState("")
     const [commentMsg, setCommentMsg] = useState("");
@@ -25,6 +29,10 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     }, [blog]);
 
     const likeBlogPost = async () => {
+        if (!user) {
+            toast.error("You need to log in to like this post.");
+            return;
+        }
         try {
             const res = await fetch(`${baseURL}/blog/like/${blog._id}`, {
                 method: "PATCH",
@@ -37,7 +45,9 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 toast.error("Unexpected error");
             }
             const data = await res.json();
-            setBlog(data.blog);
+            console.log("like dtaa", data.blog);
+            const blogd =  await fetchSingleBlogData(blog._id);
+            setBlog(blogd)
             setIsLiked(data.message === "Blog Liked" ? true : false);
             toast.success(data.message === "Blog Liked" ? "Post Liked 💘" : "Post Unliked 💔");
             return res;
@@ -50,6 +60,11 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
 
     const sendComment = async (e: FormEvent) => {
         e.preventDefault()
+        setLoaderComment(true)
+        if (!user) {
+            toast.error("You need to log in to comment.");
+            return;
+        }
         try {
             const res = await fetch(`${baseURL}/comment/create/${blog._id}`, {
                 method: "POST",
@@ -70,13 +85,20 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 setBlog(data.blog);
                 setCommentMsg("")
             }
+            setLoaderComment(false)
             return
         } catch (error) {
             console.log(error)
+            setLoaderComment(false)
         }
     }
     const sendReply = async (e: FormEvent) => {
         e.preventDefault();
+        setLoaderReply(true)
+        if (!user) {
+            toast.error("You need to log in to reply.");
+            return;
+        }
         if (replyMsg === "") return
         try {
             const res = await fetch(`${baseURL}/comment/create/${blog._id}`, {
@@ -101,8 +123,10 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 setTopCommentId("");
                 setReplyBox(false);
             }
+            setLoaderReply(false)
             return
         } catch (error) {
+            setLoaderReply(false)
             console.log(error)
         }
     }
@@ -129,17 +153,22 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
             <div className="mt-4 pb-4 border-b">
                 <h2 className="text-xl font-bold">{blog.comments.length} Comment</h2>
                 <div className="mt-2 flex items-start space-x-2">
-                    <img src={user.image} alt="User avatar" className="w-12 h-12 rounded-full" />
-                    <form className='w-full flex flex-col gap-3 items-end ml-4' onSubmit={sendComment}>
-                        <textarea
-                            className="flex-1 border w-full rounded p-2"
-                            placeholder="Write a comment..."
-                            value={commentMsg}
-                            onChange={e => setCommentMsg(e.target.value)}
-                        />
-                        <Button type='submit' className=''>Comment</Button>
-                    </form>
-
+                    {user ? (
+                        <>
+                            <img src={user.image} alt="User avatar" className="w-12 h-12 rounded-full" />
+                            <form className='w-full flex flex-col gap-3 items-end ml-4' onSubmit={sendComment}>
+                                <textarea
+                                    className="flex-1 border w-full rounded p-2"
+                                    placeholder="Write a comment..."
+                                    value={commentMsg}
+                                    onChange={e => setCommentMsg(e.target.value)}
+                                />
+                                <Button type='submit' className='' disabled={loaderComment} >Comment</Button>
+                            </form>
+                        </>
+                    ) : (
+                        <p className="text-gray-500">You need to log in to comment.</p>
+                    )}
                 </div>
             </div>
             <div className="mt-4">
@@ -149,16 +178,20 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                         <div className="flex-1">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <span className="font-bold">{comment?.commentor?.name}</span>{' '}
+                                    <Link href={`/profile/${comment?.commentor?.username}`} className="font-bold hover:text-[#EF4444]">{comment?.commentor?.name}</Link>{' '}
                                     <span className="text-gray-500">@{comment?.commentor?.username}</span>{' '}
                                     <span className="text-gray-500 text-sm">{formateBlogDate(comment?.createdAt)}</span>
                                 </div>
                                 <div className="flex space-x-2 text-gray-500">
                                     <button>Like</button>
-                                    <button onClick={() => {
-                                        setReplyBox(!replyBox);
-                                        setTopCommentId(comment._id)
-                                    }}>Reply</button>
+                                    {user ? (
+                                        <button onClick={() => {
+                                            setReplyBox(!replyBox);
+                                            setTopCommentId(comment._id)
+                                        }}>Reply</button>
+                                    ) : (
+                                        <button onClick={() => toast.error("You need to log in to reply.")}>Reply</button>
+                                    )}
                                     <button>Share</button>
                                 </div>
                             </div>
@@ -172,7 +205,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                             value={replyMsg}
                                             onChange={e => setReplyMsg(e.target.value)}
                                         />
-                                        <Button type="submit">Reply</Button>
+                                        <Button type="submit" disabled={loaderReply} >Reply</Button>
                                     </form>
                                 )
                             }
@@ -183,7 +216,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                             <img src={reply?.commentor?.image} alt="User avatar" className="w-10 h-10 rounded-full" />
                                             <div>
                                                 <div>
-                                                    <span className="font-bold">{reply?.commentor?.name}</span>{' '}
+                                                    <Link href={`/profile/${reply?.commentor?.username}`} className="font-bold hover:text-[#EF4444]" >{reply?.commentor?.name}</Link>{' '}
                                                     <span className="text-gray-500">@{reply?.commentor?.username}</span>{' '}
                                                     <span className="text-gray-500 text-sm">{formateBlogDate(reply?.createdAt)}</span>
                                                 </div>

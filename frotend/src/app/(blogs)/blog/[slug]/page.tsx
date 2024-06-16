@@ -12,7 +12,7 @@ import Link from 'next/link'
 import React from 'react'
 import { toast } from 'sonner'
 
-const fetchSingleBlogData = async (id: string) => {
+export const fetchSingleBlogData = async (id: string) => {
     try {
         const res = await fetch(`${baseURL}/blog/${id}`, { cache: "no-store" });
         if (!res.ok) {
@@ -43,9 +43,9 @@ const SingleBlogPage = async ({ params }: { params: { slug: string } }) => {
         <div className='w-full'>
             <div className='w-full flex flex-col gap-7 md:px-24 md:mt-6'>
                 <div className='max-w-full flex items-center justify-center rounded-lg mt-6'>
-                    <img src={blog.posterImg} alt='single' className='md:w-full md:h-[500px] rounded-lg w-80 h-40 object-cover' />
+                    <img src={blog.posterImg} alt='single' className='md:w-full md:h-[500px] rounded-lg w-80 h-40 object-contain' />
                 </div>
-                <div className='max-w-[45rem] mx-auto flex flex-col gap-6 md:px-3'>
+                <div className='max-w-[56rem] mx-auto flex flex-col gap-6 md:px-3'>
                     <div className='flex flex-col gap-5'>
                         <h1 className='md:text-5xl text-3xl font-bold text-[#000c2d] text-center'>{blog.title}</h1>
                         <h4 className=' text-[#4f525f] md:text-xl text-[1rem] text-center'>{blog.subTitle}</h4>

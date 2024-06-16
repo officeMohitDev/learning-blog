@@ -5,7 +5,7 @@ import FollowButton from '@/components/buttons/FollowButton';
 import { Button } from '@/components/ui/button';
 import { baseURL } from '@/constants';
 import { format, formatDistanceToNow } from 'date-fns';
-import { MoreHorizontal } from 'lucide-react';
+import { HeartIcon, MessageCircleIcon, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 
@@ -35,7 +35,7 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
         <div className="flex flex-col-reverse lg:flex-row lg:justify-between">
           {/* Left Column */}
           <div className="lg:w-2/3 flex flex-col gap-5">
-            <h1 className="text-2xl hidden lg:block font-bold">{data?.data?.username}</h1>
+            <h1 className="text-2xl hidden lg:block font-bold">@{data?.data?.username}</h1>
             <nav className="mt-2">
               <ul className="flex space-x-4">
                 <li className="text-green-500 border-b-2 border-green-500">Home</li>
@@ -103,8 +103,8 @@ const Article = ({ title, description, likes, comments, img, createdAt, id }: {
         </div>
         <div className="flex items-center text-gray-500 mt-2 space-x-4">
           <span>{formattedDate}</span> {/* Display formatted date */}
-          <span>{likes}</span>
-          <span>{comments}</span>
+          <span className='flex gap-2 items-center'> <HeartIcon /> {likes}</span>
+          <span className='flex gap-2 items-center'><MessageCircleIcon /> {comments}</span>
         </div>
       </div>
       <div className='p-4'>
