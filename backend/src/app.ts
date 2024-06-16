@@ -6,6 +6,7 @@ import blogRouter from "./blogs/blogRouter";
 import bodyParser from "body-parser";
 import cors from 'cors'
 import commentRouter from "./comments/commentRoute";
+import tagsRouter from "./tags/tagsRoutes";
 
 const app = express();
 app.use(express.json());
@@ -22,6 +23,8 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRouter);
 app.use("/api/blog", blogRouter);
 app.use("/api/comment", commentRouter);
+app.use("/api/tag", tagsRouter);
+
 
 app.use(globalErrorHandler);
 
