@@ -30,12 +30,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
-
-  console.log("straight from god", session?.user)
+  const session = await auth()
   return (
     <div className={cn(
-      "min-h-screen bg-background font-sans antialiased",
+      "min-h-screen bg-background flex flex-col justify-between font-sans antialiased",
       fontSans.variable
     )}>
       <Navbar data={session?.user as ExtendedUser} />

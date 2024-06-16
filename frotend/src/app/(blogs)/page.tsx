@@ -33,14 +33,14 @@ export default async function Home() {
           </div>
         </div>
         <div className="flex gap-4 px-6 md:px-24 flex-wrap">
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Rant</Link>
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Gossip</Link>
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Stories</Link>
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Community</Link>
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Buzz</Link>
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Confessions</Link>
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Personal</Link>
-          <Link href={"/"} className="hover:text-red-700 transition ease-in duration-200">Experiences</Link>
+          <Link href={"/tags/rant"} className="hover:text-red-700 transition ease-in duration-200">Rant</Link>
+          <Link href={"/tags/gossip"} className="hover:text-red-700 transition ease-in duration-200">Gossip</Link>
+          <Link href={"/tags/stories"} className="hover:text-red-700 transition ease-in duration-200">Stories</Link>
+          <Link href={"/tags/community"} className="hover:text-red-700 transition ease-in duration-200">Community</Link>
+          <Link href={"/tags/buzz"} className="hover:text-red-700 transition ease-in duration-200">Buzz</Link>
+          <Link href={"/tags/confessions"} className="hover:text-red-700 transition ease-in duration-200">Confessions</Link>
+          <Link href={"/tags/personal"} className="hover:text-red-700 transition ease-in duration-200">Personal</Link>
+          <Link href={"/tags/experience"} className="hover:text-red-700 transition ease-in duration-200">Experiences</Link>
         </div>
         <div className="grid grid-cols-1 place-items-center md:place-items-start md:grid-cols-2 md:px-24 px-3 gap-14 bg-[#FEFEFE]">
           {

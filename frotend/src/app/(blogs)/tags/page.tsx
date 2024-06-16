@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const tags = [
@@ -34,19 +35,19 @@ const tags = [
 ];
 
 const TagCard = ({ title, count, image }: { title: string, count: number, image: string }) => (
-    <div className="relative">
+    <Link href={`/tags/${title.toLowerCase()}`} className="relative">
         <img className="w-full h-full object-cover rounded-lg" src={image} alt={title} />
         <div className="absolute bottom-4 left-4 text-white text-lg font-bold">
             {title} ({count})
         </div>
-    </div>
+    </Link>
 );
 
 const TagsPage = () => (
     <div className="max-w-full mx-auto py-12 px-4 sm:px-6 lg:px-24">
         <h1 className="text-4xl font-bold text-center mb-8">Tags</h1>
         <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-            {tags.map((tag, index) => (
+            {tags?.map((tag, index) => (
                 <TagCard
                     key={index}
                     title={tag.title}
