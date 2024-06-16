@@ -12,7 +12,7 @@ import Link from 'next/link'
 import React from 'react'
 import { toast } from 'sonner'
 
-export const fetchSingleBlogData = async (id: string) => {
+const fetchSingleBlogData = async (id: string) => {
     try {
         const res = await fetch(`${baseURL}/blog/${id}`, { cache: "no-store" });
         if (!res.ok) {

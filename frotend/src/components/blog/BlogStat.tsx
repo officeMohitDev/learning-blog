@@ -8,18 +8,39 @@ import { formateBlogDate } from '@/utils/datefun';
 import { formatComments } from '@/lib/utils';
 import { Button } from '../ui/button';
 import Link from 'next/link';
-import { fetchSingleBlogData } from '@/app/(blogs)/blog/[slug]/page';
 
 const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     const [isLiked, setIsLiked] = useState(user ? blogData.likes.find((like: any) => like._id === user._id) : false);
     const [blog, setBlog] = useState(blogData);
     const [formattedComments, setFormattedComments] = useState<any[]>([]);
     const [loaderReply, setLoaderReply] = useState(false)
-    const [loaderComment, setLoaderComment] = useState(false)
+    const [loaderComment, setLoaderComment] = useState(false);
+    const [loaderLike, setLoaderLike] = useState(false)
     const [replyBox, setReplyBox] = useState(false);
     const [topCommentId, setTopCommentId] = useState("")
     const [commentMsg, setCommentMsg] = useState("");
     const [replyMsg, setReplyMsg] = useState("")
+
+    // fethch blogs
+
+
+    const fetchSingleBlogData = async (id: string) => {
+        try {
+            const res = await fetch(`${baseURL}/blog/${id}`, { cache: "no-store" });
+            if (!res.ok) {
+                const data = await res.json()
+                console.log(data)
+                toast.error("Something went wrong")
+                return null
+            }
+    
+            const data = await res.json()
+            return data
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    
 
     useEffect(() => {
         if (blog.comments) {
@@ -29,6 +50,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     }, [blog]);
 
     const likeBlogPost = async () => {
+        setLoaderLike(true)
         if (!user) {
             toast.error("You need to log in to like this post.");
             return;
@@ -50,9 +72,11 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
             setBlog(blogd)
             setIsLiked(data.message === "Blog Liked" ? true : false);
             toast.success(data.message === "Blog Liked" ? "Post Liked 💘" : "Post Unliked 💔");
+            setLoaderLike(false)
             return res;
         } catch (error) {
             console.log(error);
+            setLoaderLike(false)
             toast.error("Something went wrong");
         }
 
@@ -132,7 +156,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     }
 
     return (
-        <div className="max-w-3xl mx-auto p-4">
+        <div className="max-w-[56rem] mx-auto p-4">
             <div className="flex items-center space-x-2 pb-4 border-b">
                 {/* Placeholder for user avatars */}
                 {blog.likes.map((user: any) => (
@@ -141,7 +165,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 <span className="text-sm">{blog.likes.length} Likes • {blog.comments.length} Comments</span>
             </div>
             <div className="mt-4 flex space-x-4 pb-4 border-b">
-                <LikeUnlikeButton blog={blog} likeBlogPost={likeBlogPost} isLiked={isLiked} />
+                <LikeUnlikeButton loaderLike={loaderLike} blog={blog} likeBlogPost={likeBlogPost} isLiked={isLiked} />
                 <button className="text-gray-500 flex border border-gray-500 gap-2 rounded-full py-2 px-3 items-center">
                     <span> <MessageCircleIcon size={20} /> </span> {blog.comments.length}
                 </button>
