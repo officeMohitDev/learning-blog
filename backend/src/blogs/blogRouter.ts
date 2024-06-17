@@ -1,5 +1,5 @@
 import express from 'express'
-import { allBlogs, createBlog, likeOrUnlikeBlog, singleBlog } from './blogController';
+import { addToTheBookMark, allBlogs, createBlog, likeOrUnlikeBlog, singleBlog } from './blogController';
 import { verifyToken } from '../middleware/verifyToken';
 import multer from 'multer'
 import path from 'node:path';
@@ -18,5 +18,6 @@ blogRouter.post("/create", upload.fields([
 blogRouter.get("/all", allBlogs)
 blogRouter.get("/:blogId", singleBlog)
 blogRouter.patch("/like/:blogId", likeOrUnlikeBlog)
+blogRouter.patch("/save/:blogId", addToTheBookMark)
 
 export default blogRouter

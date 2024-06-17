@@ -102,8 +102,6 @@ export const singleBlog = async (req: Request, res: Response, next: NextFunction
                 select: 'username name image'
             }
         });
-
-
         if (!blog) {
             const error = createHttpError(404, "No Blog Found")
             return next(error)
@@ -155,3 +153,39 @@ export const likeOrUnlikeBlog = async (req: Request, res: Response, next: NextFu
         next(error);
     }
 };
+
+
+export const addToTheBookMark = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const blogId: any = req.params.blogId;
+        const userId = getUserIdFromAuthorizationHeader(req);
+
+        if (!blogId || !userId) {
+            const error = createHttpError(400, "Invalid ID");
+            return next(error);
+        }
+
+        const blog = await Blog.findById(blogId);
+        if (!blog) {
+            const error = createHttpError(400, "Invalid blog ID");
+            return next(error);
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            const error = createHttpError(400, "Invalid user ID");
+            return next(error);
+        }
+
+        const isBookmarked = user.savedPosts.includes(blogId);
+        const update = isBookmarked
+            ? { $pull: { savedPosts: blogId } }
+            : { $addToSet: { savedPosts: blogId } };
+
+        await User.findByIdAndUpdate(userId, update, { new: true });
+
+        res.status(200).json({ message: isBookmarked ? "Bookmark removed" : "Bookmark added" });
+    } catch (error) {
+        return next(error);
+    }
+}

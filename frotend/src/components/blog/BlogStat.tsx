@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect, useRef, FormEvent } from 'react';
 import LikeUnlikeButton from '../buttons/LikeUnlikeButton';
-import { HeartIcon, MessageCircleIcon, MoreHorizontalIcon, MoreVerticalIcon, ThumbsUp } from 'lucide-react';
+import { Bookmark, HeartIcon, MessageCircleIcon, MoreHorizontalIcon, MoreVerticalIcon, ThumbsUp } from 'lucide-react';
 import { baseURL } from '@/constants';
 import { toast } from 'sonner';
 import { formateBlogDate } from '@/utils/datefun';
@@ -11,8 +11,10 @@ import Link from 'next/link';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import { getCurrentUser } from '@/actions';
 
-const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
+const BlogStat = ({ blog: blogData, user: userData }: { blog: any, user: any }) => {
+    const [user, setUser] = useState(userData)
     const [isLiked, setIsLiked] = useState(user ? blogData.likes.find((like: any) => like._id === user._id) : false);
     const [blog, setBlog] = useState(blogData);
     const [formattedComments, setFormattedComments] = useState<any[]>([]);
@@ -28,7 +30,8 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     const [topCommentId, setTopCommentId] = useState("")
     const [commentMsg, setCommentMsg] = useState("");
     const [replyMsg, setReplyMsg] = useState("");
-    const [replyId, setReplyId] = useState("")
+    const [replyId, setReplyId] = useState("");
+    const [loaderSavedPost, setLoaderSavedPost] = useState(false)
     const replyBoxRef = useRef<HTMLFormElement | null>(null); // Create a ref for the reply box
     const replyReplyBoxRef = useRef<HTMLFormElement | null>(null); // Create a ref for the reply box
 
@@ -163,6 +166,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
         }
     }
 
+
     const sendReply = async (e: FormEvent) => {
         e.preventDefault();
         setLoaderReply(true)
@@ -205,6 +209,10 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     }
 
     const likOrUnlikeComment = async (id: string) => {
+        if (!user) {
+            toast.error("Please login")
+            return
+        }
         setLoaderLikeComment(true)
         try {
             const res = await fetch(`${baseURL}/comment/like/${id}`, {
@@ -233,6 +241,10 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     }
 
     const deleteComment = async (id: string) => {
+        if (!user) {
+            toast.error("Please login")
+            return
+        }
         try {
             const res = await fetch(`${baseURL}/comment/delete/${id}`, {
                 method: "DELETE",
@@ -257,22 +269,59 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
             console.log(error);
             return
         }
-    } 
+    }
 
+
+    const addBlogTotheBookmark = async () => {
+        if (!user) {
+            toast.error("Please login")
+            return
+        }
+        setLoaderSavedPost(true)
+
+        try {
+            const res = await fetch(`${baseURL}/blog/save/${blog._id}`, {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?._id}`,
+                },
+            });
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                toast.error("Error occured")
+                console.log(data);
+                return
+            }
+
+            fetchSingleBlogData(blog._id)
+            const userinfo = await getCurrentUser()
+            setUser(userinfo)
+            setLoaderSavedPost(false)
+            return
+
+        } catch (error) {
+            console.log(error);
+            setLoaderSavedPost(false)
+            return
+        }
+    }
 
     return (
         <div className="max-w-[56rem] mx-auto p-4">
             <div className="flex items-center space-x-2 pb-4 border-b">
                 {/* Placeholder for user avatars */}
-                {blog.likes.map((user: any) => (
+                {blog?.likes?.map((user: any) => (
                     <img key={user._id} src={user?.image || "/images/noprofile.png"} alt="User avatar" className="w-8 h-8 rounded-full" />
                 ))}
                 <span className="text-sm">{blog.likes.length} Likes • {blog.comments.length} Comments</span>
             </div>
             <div className="mt-4 flex space-x-4 pb-4 border-b">
                 <LikeUnlikeButton loaderLike={loaderLike} blog={blog} likeBlogPost={likeBlogPost} isLiked={isLiked} />
-                <button className="text-gray-500 flex border border-gray-500 gap-2 rounded-full py-2 px-3 items-center">
-                    <span> <MessageCircleIcon size={20} /> </span> {blog.comments.length}
+                <button onClick={addBlogTotheBookmark} disabled={loaderSavedPost} className="text-gray-500 flex border border-gray-500 gap-2 rounded-full py-2 px-3 items-center">
+                    <Bookmark size={20} fill={user?.savedPosts.includes(blog._id) ? '#EF4444' : "#fff"} color='#EF4444' />
                 </button>
             </div>
             <div className="mt-4 flex justify-between items-center pb-4 border-b">
@@ -312,14 +361,14 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                     <span className="text-gray-500 text-sm">{formateBlogDate(comment?.createdAt)}</span>
                                 </div>
                                 {
-                                    (user._id === comment?.commentor._id || user?._id === blog?.author?._id) && (
+                                    (user?._id === comment?.commentor._id || user?._id === blog?.author?._id) && (
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <button><MoreVerticalIcon /> </button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-fit flex flex-col gap-3">
                                                 {
-                                                    user._id === comment?.commentor._id && (
+                                                    user?._id === comment?.commentor?._id && (
                                                         <Button variant={"secondary"}>Edit</Button>
                                                     )
                                                 }
@@ -380,18 +429,18 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                                         <span className="text-gray-500 text-sm">{formateBlogDate(reply?.createdAt)}</span>
                                                     </div>
                                                     {
-                                                        (user._id === reply?.commentor._id || user?._id === blog?.author?._id) && (
+                                                        (user?._id === reply?.commentor._id || user?._id === blog?.author?._id) && (
                                                             <Popover>
                                                                 <PopoverTrigger asChild>
                                                                     <button><MoreVerticalIcon /> </button>
                                                                 </PopoverTrigger>
                                                                 <PopoverContent className="w-fit flex flex-col gap-3">
                                                                     {
-                                                                        user._id === comment?.commentor._id && (
+                                                                        user?._id === comment?.commentor._id && (
                                                                             <Button variant={"secondary"}>Edit</Button>
                                                                         )
                                                                     }
-                                                                    <Button variant={"destructive"}>Delete</Button>
+                                                                    <Button onClick={() => deleteComment(reply?._id)} variant={"destructive"}>Delete</Button>
                                                                 </PopoverContent>
                                                             </Popover>
                                                         )
@@ -420,7 +469,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                                     }}>Reply</button>
                                                 </div>
                                                 {
-                                                    (replyReplyBox && replyId === reply._id) && (
+                                                    (replyReplyBox && replyId === reply?._id) && (
                                                         <form ref={replyReplyBoxRef} className='w-full flex flex-col gap-3 items-end ml-4' onSubmit={sendReply}>
                                                             <textarea
                                                                 className="flex-1 border w-full rounded p-2"

@@ -5,7 +5,7 @@ import FollowButton from '@/components/buttons/FollowButton';
 import { Button } from '@/components/ui/button';
 import { baseURL } from '@/constants';
 import { format, formatDistanceToNow } from 'date-fns';
-import { HeartIcon, MessageCircleIcon, MoreHorizontal } from 'lucide-react';
+import { Github, GithubIcon, HeartIcon, Instagram, LinkedinIcon, MessageCircleIcon, MoreHorizontal, SignalMedium, SunMediumIcon, TrashIcon, Twitter } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 
@@ -105,6 +105,7 @@ const Article = ({ title, description, likes, comments, img, createdAt, id }: {
           <span>{formattedDate}</span> {/* Display formatted date */}
           <span className='flex gap-2 items-center'> <HeartIcon /> {likes}</span>
           <span className='flex gap-2 items-center'><MessageCircleIcon /> {comments}</span>
+          <button className='flex gap-2 items-center'><TrashIcon color='#EF4444' /></button>
         </div>
       </div>
       <div className='p-4'>
@@ -122,6 +123,20 @@ const ProfileCard = ({ data }: { data: any }) => (
         <h2 className="text-[18px] text-gray-600">{data?.data?.followers?.length} Followers</h2>
         <div className=' max-w-[400px]'>
           <p className="text-gray-500 text-[15px] hidden lg:flex">{data?.data?.about?.slice(0, 120)}...</p>
+        </div>
+        <div className='flex gap-2 justify-between mb-4'>
+          <a target='_blank' href={data?.data?.socialLinks?.linkedin} className='text-black'>
+            <LinkedinIcon />
+          </a>
+          <a target='_blank' href={data?.data?.socialLinks?.github} className='text-black'>
+            <GithubIcon />
+          </a>
+          <a target='_blank' href={data?.data?.socialLinks?.instagram} className='text-black'>
+            <Instagram />
+          </a>
+          <a target='_blank' href={data?.data?.socialLinks?.twitter} className='text-black'>
+            <Twitter />
+          </a>
         </div>
         <div className='flex gap-4 w-full'>
           {
