@@ -189,3 +189,29 @@ export const addToTheBookMark = async (req: Request, res: Response, next: NextFu
         return next(error);
     }
 }
+
+
+export const deleteBlog = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const blogId: any = req.params.blogId;
+        const userId: any = getUserIdFromAuthorizationHeader(req);
+
+        const blog = await Blog.findById(blogId);
+
+        if (!blog) {
+            const error = createHttpError(404, "No blog found");
+            return next(error);
+        }
+
+        if (blog.author !== userId) {
+            const error = createHttpError(400, "UnAuthorize");
+            return next(error);
+        }
+
+        const deleteBlog = await Blog.findByIdAndDelete(blog._id)
+
+        res.status(200).json({ message: "Deleted" })
+    } catch (error) {
+        next(error)
+    }
+}
