@@ -119,3 +119,48 @@ export const likeOrUnlikeComment = async (req: Request,
         next(error)
     }
 }
+
+export const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const commentId = req.params.commentId;
+        const userId: any = getUserIdFromAuthorizationHeader(req);
+
+        if (!mongoose.Types.ObjectId.isValid(commentId) || !mongoose.Types.ObjectId.isValid(userId)) {
+            return next(createHttpError(400, "Invalid comment or user ID"));
+        }
+
+        const comment: any = await Comment.findById(commentId).populate("blogId");
+        if (!comment || !userId) {
+            return next(createHttpError(404, "Comment not found"));
+        }
+
+        const blogAuthorId = String(comment.blogId.author);
+        const commentAuthorId = String(comment.commentor);
+
+        if (userId !== commentAuthorId && userId !== blogAuthorId) {
+            return next(createHttpError(403, "You are not authorized"));
+        }
+
+        // Fetch the top comment and all nested comments to be deleted
+        const commentsToDelete = await Comment.find({
+            $or: [
+                { _id: commentId },
+                { topCommentId: commentId }
+            ]
+        });
+
+        const commentIdsToDelete = commentsToDelete.map((comment: any) => comment._id);
+
+        // Delete all comments in one operation
+        await Comment.deleteMany({ _id: { $in: commentIdsToDelete } });
+
+        // Remove deleted comments from the blog's comments array
+        await Blog.findByIdAndUpdate(comment.blogId._id, {
+            $pull: { comments: { $in: commentIdsToDelete } }
+        });
+
+        res.status(200).json({ message: "Deleted" });
+    } catch (error) {
+        next(error);
+    }
+};
