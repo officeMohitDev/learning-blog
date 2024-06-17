@@ -1,29 +1,74 @@
 "use client"
-import React, { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, useRef, FormEvent } from 'react';
 import LikeUnlikeButton from '../buttons/LikeUnlikeButton';
-import { HeartIcon, MessageCircleIcon, ThumbsUp } from 'lucide-react';
+import { HeartIcon, MessageCircleIcon, MoreHorizontalIcon, MoreVerticalIcon, ThumbsUp } from 'lucide-react';
 import { baseURL } from '@/constants';
 import { toast } from 'sonner';
 import { formateBlogDate } from '@/utils/datefun';
 import { formatComments } from '@/lib/utils';
 import { Button } from '../ui/button';
 import Link from 'next/link';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
 
 const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
     const [isLiked, setIsLiked] = useState(user ? blogData.likes.find((like: any) => like._id === user._id) : false);
     const [blog, setBlog] = useState(blogData);
     const [formattedComments, setFormattedComments] = useState<any[]>([]);
+    const [replyReplyBox, setReplyReplyBox] = useState(false)
     const [loaderReply, setLoaderReply] = useState(false)
     const [loaderComment, setLoaderComment] = useState(false);
+    const [replyerUsername, setReplyerUsername] = useState("")
+    const [repliedCommentId, setRepliedCommentId] = useState("");
+    const [topComment, setTopComment] = useState("")
     const [loaderLike, setLoaderLike] = useState(false)
     const [replyBox, setReplyBox] = useState(false);
+    const [loaderLikeComment, setLoaderLikeComment] = useState(false)
     const [topCommentId, setTopCommentId] = useState("")
     const [commentMsg, setCommentMsg] = useState("");
-    const [replyMsg, setReplyMsg] = useState("")
+    const [replyMsg, setReplyMsg] = useState("");
+    const [replyId, setReplyId] = useState("")
+    const replyBoxRef = useRef<HTMLFormElement | null>(null); // Create a ref for the reply box
+    const replyReplyBoxRef = useRef<HTMLFormElement | null>(null); // Create a ref for the reply box
 
-    // fethch blogs
+    // Function to handle clicks outside the reply box
+    const handleClickOutside = (event: MouseEvent) => {
+        if (replyBoxRef.current && !replyBoxRef.current.contains(event.target as Node)) {
+            setReplyBox(false);
+        }
+    };
+    const replyclickOutside = (event: MouseEvent) => {
+        if (replyReplyBoxRef.current && !replyReplyBoxRef.current.contains(event.target as Node)) {
+            setReplyReplyBox(false);
+        }
+    };
 
+    useEffect(() => {
+        if (replyBox) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
 
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [replyBox]);
+
+    useEffect(() => {
+        if (replyReplyBox) {
+            document.addEventListener('mousedown', replyclickOutside);
+        } else {
+            document.removeEventListener('mousedown', replyclickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', replyclickOutside);
+        };
+    }, [replyReplyBox]);
+
+    // fetch blogs
     const fetchSingleBlogData = async (id: string) => {
         try {
             const res = await fetch(`${baseURL}/blog/${id}`, { cache: "no-store" });
@@ -33,14 +78,14 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 toast.error("Something went wrong")
                 return null
             }
-    
+
             const data = await res.json()
+            setBlog(data)
             return data
         } catch (error) {
             console.log(error)
         }
     }
-    
 
     useEffect(() => {
         if (blog.comments) {
@@ -48,6 +93,8 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
             setFormattedComments(formatted);
         }
     }, [blog]);
+
+    console.log("blogdata", formattedComments);
 
     const likeBlogPost = async () => {
         setLoaderLike(true)
@@ -68,8 +115,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
             }
             const data = await res.json();
             console.log("like dtaa", data.blog);
-            const blogd =  await fetchSingleBlogData(blog._id);
-            setBlog(blogd)
+            fetchSingleBlogData(blog._id);
             setIsLiked(data.message === "Blog Liked" ? true : false);
             toast.success(data.message === "Blog Liked" ? "Post Liked 💘" : "Post Unliked 💔");
             setLoaderLike(false)
@@ -116,6 +162,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
             setLoaderComment(false)
         }
     }
+
     const sendReply = async (e: FormEvent) => {
         e.preventDefault();
         setLoaderReply(true)
@@ -134,7 +181,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 body: JSON.stringify({
                     topCommentId,
                     isNested: true,
-                    commentMsg: replyMsg,
+                    commentMsg: `@${replyerUsername} ${replyMsg}`,
                     pinned: false
                 })
             })
@@ -146,6 +193,8 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                 setReplyMsg("");
                 setTopCommentId("");
                 setReplyBox(false);
+                setReplyReplyBox(false)
+                setLoaderReply(false)
             }
             setLoaderReply(false)
             return
@@ -154,6 +203,62 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
             console.log(error)
         }
     }
+
+    const likOrUnlikeComment = async (id: string) => {
+        setLoaderLikeComment(true)
+        try {
+            const res = await fetch(`${baseURL}/comment/like/${id}`, {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?._id}`,
+                },
+            })
+
+            const data = await res.json();
+            if (!res.ok) {
+                console.log(data);
+                toast.error("Error occured")
+                return
+            }
+            fetchSingleBlogData(blog._id);
+            toast.success("Comment Liked!!")
+            setLoaderLikeComment(false)
+            return
+        } catch (error) {
+            console.log(error);
+            toast.error("Something went wrong!!")
+            setLoaderLikeComment(false)
+        }
+    }
+
+    const deleteComment = async (id: string) => {
+        try {
+            const res = await fetch(`${baseURL}/comment/delete/${id}`, {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user?._id}`,
+                },
+            })
+
+            const data = await res.json();
+            if (!res.ok) {
+                console.log(data);
+                toast.error("Error Occured")
+            }
+
+            console.log(data);
+            fetchSingleBlogData(blog._id)
+            toast.success("Comment deleted")
+            return
+
+        } catch (error) {
+            console.log(error);
+            return
+        }
+    } 
+
 
     return (
         <div className="max-w-[56rem] mx-auto p-4">
@@ -206,26 +311,52 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                     <span className="text-gray-500">@{comment?.commentor?.username}</span>{' '}
                                     <span className="text-gray-500 text-sm">{formateBlogDate(comment?.createdAt)}</span>
                                 </div>
+                                {
+                                    (user._id === comment?.commentor._id || user?._id === blog?.author?._id) && (
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button><MoreVerticalIcon /> </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-fit flex flex-col gap-3">
+                                                {
+                                                    user._id === comment?.commentor._id && (
+                                                        <Button variant={"secondary"}>Edit</Button>
+                                                    )
+                                                }
+                                                <Button onClick={() => deleteComment(comment?._id)} variant={"destructive"}>Delete</Button>
+                                            </PopoverContent>
+                                        </Popover>
+                                    )
+                                }
                             </div>
-                            <p className="mt-2">{comment?.comment}</p>
+                            <p className="">{comment?.comment}</p>
                             <div className="flex space-x-2 text-gray-500">
                                 <div className='flex items-center gap-2'>
-                                    <button><HeartIcon fill='#EF4444' color='#EF4444' /> </button>
-                                    <span>{comment.likes.length}</span>
+                                    <button disabled={loaderLikeComment} onClick={() => likOrUnlikeComment(comment._id)}>
+                                        {
+                                            comment?.likes?.find((like: any) => like === user?._id) ? (
+                                                <HeartIcon fill='#EF4444' color='#EF4444' />
+                                            ) :
+                                                <HeartIcon fill='#fff' color='#000' />
+                                        }
+                                    </button>
+                                    <span>{comment?.likes?.length}</span>
                                 </div>
 
-                                    {user ? (
-                                        <button onClick={() => {
-                                            setReplyBox(!replyBox);
-                                            setTopCommentId(comment._id)
-                                        }}>Reply</button>
-                                    ) : (
-                                        <button onClick={() => toast.error("You need to log in to reply.")}>Reply</button>
-                                    )}
-                                </div>
+                                {user ? (
+                                    <button onClick={() => {
+                                        setReplyBox(!replyBox);
+                                        setTopCommentId(comment._id);
+                                        setTopComment(comment._id);
+                                        setReplyerUsername(comment?.commentor?.username)
+                                    }}>Reply</button>
+                                ) : (
+                                    <button onClick={() => toast.error("You need to log in to reply.")}>Reply</button>
+                                )}
+                            </div>
                             {
-                                replyBox && topCommentId === comment._id && (
-                                    <form className='w-full flex flex-col gap-3 items-end ml-4' onSubmit={sendReply}>
+                                (replyBox && topComment === comment._id) && (
+                                    <form ref={replyBoxRef} className='w-full flex flex-col gap-3 items-end ml-4' onSubmit={sendReply}>
                                         <textarea
                                             className="flex-1 border w-full rounded p-2"
                                             placeholder="Write a Reply..."
@@ -239,15 +370,68 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                             {comment?.replies?.length > 0 && (
                                 <div className="ml-1 mt-2 space-y-2">
                                     {comment?.replies?.map((reply: any) => (
-                                        <div key={reply._id} className="flex space-x-2 mt-6">
+                                        <div key={reply._id} className="flex w-full space-x-2 mt-6">
                                             <img src={reply?.commentor?.image} alt="User avatar" className="w-10 h-10 rounded-full" />
-                                            <div>
-                                                <div>
-                                                    <Link href={`/profile/${reply?.commentor?.username}`} className="font-bold hover:text-[#EF4444]" >{reply?.commentor?.name}</Link>{' '}
-                                                    <span className="text-gray-500">@{reply?.commentor?.username}</span>{' '}
-                                                    <span className="text-gray-500 text-sm">{formateBlogDate(reply?.createdAt)}</span>
+                                            <div className='w-full'>
+                                                <div className='flex justify-between w-full items-center'>
+                                                    <div>
+                                                        <Link href={`/profile/${reply?.commentor?.username}`} className="font-bold hover:text-[#EF4444]" >{reply?.commentor?.name}</Link>{' '}
+                                                        <span className="text-gray-500">@{reply?.commentor?.username}</span>{' '}
+                                                        <span className="text-gray-500 text-sm">{formateBlogDate(reply?.createdAt)}</span>
+                                                    </div>
+                                                    {
+                                                        (user._id === reply?.commentor._id || user?._id === blog?.author?._id) && (
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <button><MoreVerticalIcon /> </button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent className="w-fit flex flex-col gap-3">
+                                                                    {
+                                                                        user._id === comment?.commentor._id && (
+                                                                            <Button variant={"secondary"}>Edit</Button>
+                                                                        )
+                                                                    }
+                                                                    <Button variant={"destructive"}>Delete</Button>
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                        )
+                                                    }
+
                                                 </div>
                                                 <p className="mt-1">{reply?.comment}</p>
+                                                <div className='flex gap-3 mt-2 items-center'>
+                                                    <div className='flex items-center gap-2'>
+                                                        <button disabled={loaderLikeComment} onClick={() => likOrUnlikeComment(reply._id)}>
+                                                            {
+                                                                reply?.likes?.find((like: any) => like === user?._id) ? (
+                                                                    <HeartIcon fill='#EF4444' color='#EF4444' />
+                                                                ) :
+                                                                    <HeartIcon fill='#fff' color='#000' />
+                                                            }
+                                                        </button>
+                                                        <span>{reply?.likes?.length}</span>
+                                                    </div>
+                                                    <button onClick={() => {
+                                                        setReplyReplyBox(!replyReplyBox);
+                                                        setReplyId(reply?._id)
+                                                        setTopCommentId(comment?._id)
+                                                        setReplyerUsername(reply?.commentor?.username)
+
+                                                    }}>Reply</button>
+                                                </div>
+                                                {
+                                                    (replyReplyBox && replyId === reply._id) && (
+                                                        <form ref={replyReplyBoxRef} className='w-full flex flex-col gap-3 items-end ml-4' onSubmit={sendReply}>
+                                                            <textarea
+                                                                className="flex-1 border w-full rounded p-2"
+                                                                placeholder="Write a Reply..."
+                                                                value={replyMsg}
+                                                                onChange={e => setReplyMsg(e.target.value)}
+                                                            />
+                                                            <Button type="submit" disabled={loaderReply} >Reply</Button>
+                                                        </form>
+                                                    )
+                                                }
                                             </div>
                                         </div>
                                     ))}
