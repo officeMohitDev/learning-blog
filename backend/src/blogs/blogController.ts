@@ -203,7 +203,9 @@ export const deleteBlog = async (req: Request, res: Response, next: NextFunction
             return next(error);
         }
 
-        if (blog.author !== userId) {
+        console.log(String(blog.author), userId);
+
+        if (String(blog.author) !== userId) {
             const error = createHttpError(400, "UnAuthorize");
             return next(error);
         }

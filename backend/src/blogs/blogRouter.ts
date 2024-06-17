@@ -1,5 +1,5 @@
 import express from 'express'
-import { addToTheBookMark, allBlogs, createBlog, likeOrUnlikeBlog, singleBlog } from './blogController';
+import { addToTheBookMark, allBlogs, createBlog, deleteBlog, likeOrUnlikeBlog, singleBlog } from './blogController';
 import { verifyToken } from '../middleware/verifyToken';
 import multer from 'multer'
 import path from 'node:path';
@@ -19,5 +19,6 @@ blogRouter.get("/all", allBlogs)
 blogRouter.get("/:blogId", singleBlog)
 blogRouter.patch("/like/:blogId", likeOrUnlikeBlog)
 blogRouter.patch("/save/:blogId", addToTheBookMark)
+blogRouter.delete("/delete/:blogId", deleteBlog)
 
 export default blogRouter

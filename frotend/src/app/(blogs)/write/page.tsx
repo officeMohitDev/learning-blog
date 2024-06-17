@@ -65,10 +65,21 @@ const WritePage = () => {
         setContent(content);
     };
 
+    const areAllTheFieldsFilled = () => {
+        if (blogData.title == "" || !blogData.posterImg || blogData.tags.length == 0 || blogData.content == "" || blogData.subTitle == "") {
+            return false
+        } else {
+            return true
+        }
+    }
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setIsLoading(true)
-        console.log("content", blogData);
+        if (blogData.title == "" || !blogData.posterImg || blogData.tags.length == 0 || blogData.content == "" || blogData.subTitle == "") {
+            toast.error("All the field should be filled")
+            return
+        }
         try {
             const formData = new FormData();
             formData.append("title", blogData.title);
@@ -170,7 +181,7 @@ const WritePage = () => {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="submit" onClick={handleSubmit} disabled={isLoading} >Save changes</Button>
+                            <Button type="submit" onClick={handleSubmit} disabled={isLoading || !areAllTheFieldsFilled()} >Save changes</Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>

@@ -1,6 +1,7 @@
 
 import { auth } from '@/auth';
 import LogoutButton from '@/components/LogoutButton';
+import DeleteBlogButton from '@/components/buttons/DeleteBlogButton';
 import FollowButton from '@/components/buttons/FollowButton';
 import { Button } from '@/components/ui/button';
 import { baseURL } from '@/constants';
@@ -9,6 +10,13 @@ import { Github, GithubIcon, HeartIcon, Instagram, LinkedinIcon, MessageCircleIc
 import Link from 'next/link';
 import React from 'react';
 
+
+interface DataFromDB {
+  data: any;
+  currentUser: any;
+  loggedInUser: Boolean;
+  blog: any
+}
 
 const getUserDetails = async (username: string) => {
   try {
@@ -19,7 +27,6 @@ const getUserDetails = async (username: string) => {
       throw Error(data.message || "Error while fetching Data")
     }
     const data = await res.json();
-    console.log("real user", data)
     return { data: data.user, loggedInUser: session?.user?.email === data.user.email, currentUser: session?.user, blog: data.blog }
   } catch (error) {
     console.log(error)
@@ -27,8 +34,11 @@ const getUserDetails = async (username: string) => {
   }
 }
 
+
+
 const MediumProfile = async ({ params }: { params: { username: string } }) => {
-  const data = await getUserDetails(params.username)
+  const data: DataFromDB = await getUserDetails(params.username)
+
   return (
     <div className='w-full'>
       <div className="mx-auto py-6 lg:px-28 px-4 lg:mt-6">
@@ -48,6 +58,7 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
                   data?.blog?.map((post: any) => (
                     <Article
                       key={post._id}
+                      userId={data?.currentUser?._id}
                       id={post._id}
                       title={post.title}
                       description={post.subTitle}
@@ -72,14 +83,15 @@ const MediumProfile = async ({ params }: { params: { username: string } }) => {
   );
 };
 
-const Article = ({ title, description, likes, comments, img, createdAt, id }: {
+const Article = ({ title, description, userId, likes, comments, img, createdAt, id }: {
   title: string;
   description: string;
   likes: string | number;
   comments: string;
   img: string;
   id: string;
-  createdAt: string; // assuming createdAt is the creation date of the post
+  userId: string
+  createdAt: string;
 }) => {
   // Calculate the difference between the creation date and current date
   const createdAtDate = new Date(createdAt);
@@ -105,7 +117,7 @@ const Article = ({ title, description, likes, comments, img, createdAt, id }: {
           <span>{formattedDate}</span> {/* Display formatted date */}
           <span className='flex gap-2 items-center'> <HeartIcon /> {likes}</span>
           <span className='flex gap-2 items-center'><MessageCircleIcon /> {comments}</span>
-          <button className='flex gap-2 items-center'><TrashIcon color='#EF4444' /></button>
+          <DeleteBlogButton userId={userId} blogId={id} />
         </div>
       </div>
       <div className='p-4'>
