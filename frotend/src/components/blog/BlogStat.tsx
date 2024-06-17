@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect, FormEvent } from 'react';
 import LikeUnlikeButton from '../buttons/LikeUnlikeButton';
-import { MessageCircleIcon } from 'lucide-react';
+import { HeartIcon, MessageCircleIcon, ThumbsUp } from 'lucide-react';
 import { baseURL } from '@/constants';
 import { toast } from 'sonner';
 import { formateBlogDate } from '@/utils/datefun';
@@ -206,8 +206,14 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                     <span className="text-gray-500">@{comment?.commentor?.username}</span>{' '}
                                     <span className="text-gray-500 text-sm">{formateBlogDate(comment?.createdAt)}</span>
                                 </div>
-                                <div className="flex space-x-2 text-gray-500">
-                                    <button>Like</button>
+                            </div>
+                            <p className="mt-2">{comment?.comment}</p>
+                            <div className="flex space-x-2 text-gray-500">
+                                <div className='flex items-center gap-2'>
+                                    <button><HeartIcon fill='#EF4444' color='#EF4444' /> </button>
+                                    <span>{comment.likes.length}</span>
+                                </div>
+
                                     {user ? (
                                         <button onClick={() => {
                                             setReplyBox(!replyBox);
@@ -216,10 +222,7 @@ const BlogStat = ({ blog: blogData, user }: { blog: any, user: any }) => {
                                     ) : (
                                         <button onClick={() => toast.error("You need to log in to reply.")}>Reply</button>
                                     )}
-                                    <button>Share</button>
                                 </div>
-                            </div>
-                            <p className="mt-2">{comment?.comment}</p>
                             {
                                 replyBox && topCommentId === comment._id && (
                                     <form className='w-full flex flex-col gap-3 items-end ml-4' onSubmit={sendReply}>

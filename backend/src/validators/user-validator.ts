@@ -1,4 +1,4 @@
-import {string, z} from 'zod'
+import { z } from 'zod';
 
 // Define the schema for the socialLinks object
 const SocialLinksSchema = z.object({
@@ -13,11 +13,11 @@ const SocialLinksSchema = z.object({
 export const userUpdateSchema = z.object({
     username: z.string().optional(),
     name: z.string().optional(),
-    image: z.union([z.string(), z.instanceof(File)]).optional(), // Assuming image is a string representing the URL
+    image: z.string().optional(), // Assuming image is a string URL or a File instance
     role: z.string().optional(),
     location: z.string().optional(),
     date: z.string().optional(),
     about: z.string().optional(),
     socialLinks: SocialLinksSchema.optional(),
-    website: z.string().optional(),
+    website: z.string().url().optional(),
 });

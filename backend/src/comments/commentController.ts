@@ -5,6 +5,7 @@ import { Blog } from "../blogs/blogModal";
 import createHttpError from "http-errors";
 import { populate } from "dotenv";
 import { cp } from "fs";
+import mongoose, { ObjectId } from "mongoose";
 
 export const CreateComment = async (req: Request,
     res: Response,
@@ -67,6 +68,52 @@ export const allComments = async (req: Request,
             return next(error)
         }
         res.status(200).json(comments)
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+export const likeOrUnlikeComment = async (req: Request,
+    res: Response,
+    next: NextFunction) => {
+    try {
+        const commentId = req.params.commentId;
+        const userId = getUserIdFromAuthorizationHeader(req)
+
+        if (!mongoose.Types.ObjectId.isValid(commentId)) {
+            const error = createHttpError(400, "Invalid comment ID");
+            return next(error);
+        }
+
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            const error = createHttpError(404, "Comment not found")
+            return next(error)
+        }
+        const isLiked = comment.likes.some((likeId: mongoose.Types.ObjectId) => likeId.equals(userId));
+
+        let updatedComment;
+        let message;
+
+        if (isLiked) {
+            updatedComment = await Comment.findByIdAndUpdate(commentId, {
+                $pull: { likes: userId }
+            }, { new: true })
+            message = "comment Unliked";
+        } else {
+            updatedComment = await Comment.findByIdAndUpdate(commentId, {
+                $addToSet: { likes: userId }
+            }, { new: true })
+            message = "comment Liked";
+        }
+
+
+        res.status(200).json({
+            message,
+            comment: updatedComment
+        })
 
     } catch (error) {
         next(error)
